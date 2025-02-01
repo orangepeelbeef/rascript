@@ -429,8 +429,22 @@ function currentLocationSpawnflags(index) => locationSpawnflags(locationid(), in
 //          bit6=
 //          bit7=
 
-function IsSpawnedUprDeckPilothouseCurePotionInCabinet()  => bit3(locationSpawnflags(0,0))
-function IsSpawnedUprDeckPilothouseCurePotionInCabinet2() => bit4(locationSpawnflags(0,0))
+function IsSpawnedUprDeckPilothouseCurePotionInCabinet()  => bit3(locationSpawnflags(Pilothouse,0))
+function IsSpawnedUprDeckPilothouseCurePotionInCabinet2() => bit4(locationSpawnflags(Pilothouse,0))
+
+// $1A4A6A: [2bytes] LocationSpawnArray[01] upr deck passageway outside spawns
+
+// bit0=Greg Capstan (captain) astral piece
+// bit1=John Cutter astral piece
+
+function IsSpawnedJohnCutterAstral() => bit1(locationSpawnflags(UprDeckPassageway,0))
+
+// [2bytes] LocationSpawnArray[02] Chart Room spawns
+
+// bit0=Billy Bollard Astral Piece 
+// bit1=Iron Key
+
+function IsSpawnedBillyBollardAstral() => bit0(locationSpawnflags(ChartRoom,0))
 
 // $1A4A6E: [16-bit] LocationSpawnArray[03] captain's cabin spawns
 //          
@@ -445,41 +459,49 @@ function IsSpawnedWireCutter() => bit0(locationSpawnflags(4,0))
 // $1A4A74: [16-bit] LocationSpawnArray[06] floor 1 lounge
 //          
 //          bit0=claim ticket (far left under bar)
-function IsSpawnedFloor1LoungeClaimTicketFarLeftUnderBar() => bit0(locationSpawnflags(6,0))
+function IsSpawnedFloor1LoungeClaimTicketFarLeftUnderBar() => bit0(locationSpawnflags(Lounge,0))
 
 // $1A4A78: [16-bit] LocationSpawnArray[08] floor 1 grand dining
 //          
 //          bit0=fire bird plate (after talking to ghost couple)
 //          bit1=claim ticket (on table opposite the kitchen door)
-function IsSpawnedFloor1GrandDiningClaimTicketOnTableOppositeTheKitchenDoor() => bit1(locationSpawnflags(8,0))
+function IsSpawnedFloor1GrandDiningClaimTicketOnTableOppositeTheKitchenDoor() => bit1(locationSpawnflags(GrandDining,0))
+
+// $1a4a82 [2 bytes] LocationSpawnArray[0d] dining room hallway
+//          bit1=Peter Schooner astral piece
+function IsSpawnedStewardAstral() => bit1(locationSpawnflags(DiningHallway,0))
 
 // $1A4A8A: [16-bit] LocationSpawnArray[11] guest room C spawns
 //          
 //          0| Sailor Medal C
 //          1| Cure Potion (drawer)
 //          2| Fiana Parcelling astral piece
-function IsSpawnedGuestRoomCCuringPotionInDrawer() => bit1(locationSpawnflags(0x11,0))
+function IsSpawnedGuestRoomCCuringPotionInDrawer() => bit1(locationSpawnflags(GuestRoomC,0))
+function IsSpawnedFianaAstral()                    => bit2(locationSpawnflags(GuestRoomC,0))
+
 
 // $1A4A8C: [16-bit] LocationSpawnArray[12] guest room D spawns
 //          
 //          0| Sailor Medal D
 //          1| Cure Potion (drawer)
 //          2| Diana Parcelling astral piece
-function IsSpawnedGuestRoomDCuringPotionInDrawer() => bit1(locationSpawnflags(0x12,0))
+function IsSpawnedGuestRoomDCuringPotionInDrawer() => bit1(locationSpawnflags(GuestRoomD,0))
+function IsSpawnedDianaAstral()                    => bit2(locationSpawnflags(GuestRoomD,0))
 
 // $1A4A8E: [16-bit] LocationSpawnArray[13] Floor 1 Special Guest Room
 //          
 //          0| Dress Suit
 //          1| Claim Ticket (bathroom floor)
-function IsSpawnedSpecialGuestRoomClaimTicketBathroomFloor() => bit1(locationSpawnflags(0x13,0))
+function IsSpawnedSpecialGuestRoomClaimTicketBathroomFloor() => bit1(locationSpawnflags(SpecialGuestRoom,0))
+function IsSpawnedClaudiasDoll()                             => bit2(locationSpawnflags(SpecialGuestRoom,0))
 
 // $1A4A92: [16-bit] LocationSpawnArray[15] Floor 2 Medical Office
 //          
 //          bit0=curing potion (drawer)
 //          bit1=curing potion (cabinet)
 //          bit2=antidote (locked in cabinet drawer)
-function IsSpawnedFloor2MedicalOfficeCuringPotionDrawer() => bit0(locationSpawnflags(0x15,0))
-function IsSpawnedFloor2MedicalOfficeCuringPotionCabinet() => bit1(locationSpawnflags(0x15,0))
+function IsSpawnedFloor2MedicalOfficeCuringPotionDrawer()  => bit0(locationSpawnflags(MedicalOffice,0))
+function IsSpawnedFloor2MedicalOfficeCuringPotionCabinet() => bit1(locationSpawnflags(MedicalOffice,0))
 
 // $1A4A98: [16-bit] LocationSpawnArray[18] Laboratory
 // bit0= prescription in drawer
@@ -507,8 +529,8 @@ function IsSpawnedFloor2EngineersRoomCuringPotionInBackRoomChest() => bit1(locat
 //          +0x0 bitflags1
 //          - - 1| claim ticket (in locker starboard side lockerroom)
 //          - - 2| curing potion (far left locker in the port side lockerroom)
-function IsSpawnedLwrDeckPoolClaimTicketInStarboardLocker() => bit1(locationSpawnflags(0x1d,0))
-function IsSpawnedLwrDeckPoolRoomCuringPotionInPortLocker() => bit2(locationSpawnflags(0x1d,0))
+function IsSpawnedLwrDeckPoolClaimTicketInStarboardLocker() => bit1(locationSpawnflags(Pool,0))
+function IsSpawnedLwrDeckPoolRoomCuringPotionInPortLocker() => bit2(locationSpawnflags(Pool,0))
 
 // $1A4AA6: [2bytes] LocationSpawnArray[1f] Floor 2 Casino
 //          
@@ -523,19 +545,19 @@ function IsSpawnedFloor2CasinoClaimTicketFloorByRouletteTable() => bit0(location
 //          
 //          +0x0 bitflags1
 //          - - 0| Curing potion  (middle locker)
-function IsSpawnedFloor2ShowerRoomCuringPotionInLocker() => bit0(locationSpawnflags(0x22,0))
+function IsSpawnedFloor2ShowerRoomCuringPotionInLocker() => bit0(locationSpawnflags(ShowerRoom,0))
 
 // $1A4AAE: [16-bit] LocationSpawnArray[23] Floor 2 Bathroom
 //          
 //          +0x0 bitflags
 //          - - 0| Claim ticket (last toilet stall)
-function IsSpawnedFloor2BathroomClaimTicketInLastStall() => bit0(locationSpawnflags(0x23,0))
+function IsSpawnedFloor2BathroomClaimTicketInLastStall() => bit0(locationSpawnflags(Bathroom,0))
 
 // $1A4AC6: [16-bit] LocationSpawnArray[2f] Floor 1 Water Room
 //          
 //          bit0=clock key (on table main room)
 //          bit1=curing potion (ground in bedroom)
-function IsSpawnedFloor1WaterRoomCuringPotionGroundInBedroom() => bit1(locationSpawnflags(0x2f,0))
+function IsSpawnedFloor1WaterRoomCuringPotionGroundInBedroom() => bit1(locationSpawnflags(WaterRoom,0))
 
 // 2a Theater Hallway
 function PouringAntidote() => bit0(locationSpawnflags(TheaterHallway,0))
@@ -545,23 +567,23 @@ function PouringAntidote() => bit0(locationSpawnflags(TheaterHallway,0))
 //          
 //          bit0=Jack Rockwell astral piece
 //          bit1=claim ticket (on large bed)
-function IsSpawnedFloor1FireRoomClaimTicketOnLargeBed() => bit1(locationSpawnflags(0x32,0))
+function IsSpawnedFloor1FireRoomClaimTicketOnLargeBed() => bit1(locationSpawnflags(FireRoom,0))
 
 
 // $1A4AE0: [16-bit] LocationSpawnArray[3c] The Past Abandoned Mine C
 // bit0=Claudia's Doll
-function IsSpawnedClaudiasDoll() => bit0(locationBitflags(AbandonedMineC,0))
+//function IsSpawnedClaudiasDoll() => bit0(locationSpawnflags(AbandonedMineC,0))
 
 // $1A4AF0: [16-bit] LocationSpawnArray[44] Boiler A
 //          
 //          bit0=piston key
 //          bit1=curing potion (floor at bottom of stairs)
-function IsSpawnedBoilerACuringPotionFloorAtBottomOfStairs() => bit1(locationSpawnflags(0x44,0))
+function IsSpawnedBoilerACuringPotionFloorAtBottomOfStairs() => bit1(locationSpawnflags(BoilerA,0))
 
 // $1A4B00: [16-bit] LocationSpawnArray[4c] Amusement Park Carousel
 //
 //          bit0=engagement ring
-function IsSpawnedAmusementParkEngagementRing() => bit0(locationSpawnflags(0x4c,0))
+function IsSpawnedAmusementParkEngagementRing() => bit0(locationSpawnflags(AmusementParkCarousel,0))
 
 
 // $1A6B30: [32-bit] GameTime
@@ -830,6 +852,12 @@ function personNoteByte(index,offset) => byte(PersonNotesAddr + offset + (index 
 function personNoteBit(index,offset,notebit) {
     return bit(notebit, PersonNotesAddr + offset + (index * 16))
 }
+// $1BCBC8: [128 bytes][Array] PeopleMetArray
+// static config all initialized to ff, loaded with savegame
+// As you meet people and talk to them their 8-bit ID is recorded in the next non-ff containing slot
+// See 1ad710 for ID's
+
+PeopleMetAddr = 0x1BCBC8
 
 
 LocationBitflagsAddr = 0x1BCE58
@@ -866,6 +894,7 @@ function PoolPumpStarted()           => bit0(locationBitflags(TerraceLazarette,1
 function OpenedLockerFour()          => bit1(locationBitflags(CrewsQuartersA,0))
 function GotSailorsDocument()        => bit1(locationBitflags(CrewsQuartersB,0))
 function CompletedPastHouseOutside() => bit0(locationBitflags(PastHouseOutside,0))
+function PrescriptionDelivered()     => bit1(locationBitflags(MedicalOffice,0))
 
 /* $1BC660  [20 bytes] Static Config CodeFlow And Position
 
@@ -891,7 +920,7 @@ These 20 bytes are saved and loaded with your game
 
 */
 
-CodeFlow = 0x1BC660
+function CodeFlow() => dword(0x1BC660)
 
 // $1BEBC8: [384bytes][Array] PlayerInventory Array (96 slots)
 //          
@@ -1090,6 +1119,13 @@ function EncounteredHowardBoss()    => personNoteBit(HowardBoss,0,0)
 // talked to mike transom before sending the patrolman out
 function EncounteredMikeTransom()   => personNoteBit(MikeTransom,0,0)
 
+
+
+
+
+
+/* I like very little of these in practice
+
 PeopleDossier= [
     // 0 unused
     {},
@@ -1115,10 +1151,10 @@ PeopleDossier= [
     {"name": "Pole & Paddle", "notevalue": 2, "subname": "Soldiers", "location": Castle, "points": 1, "type": "missable", "encounterbit": EncounteredPoleAndPaddle()},
     // 11 marvin foremast house, he's talked to as part of thorough investigation
     {},
-    // 12 fiana parcelling  move the register to block the door
-    {"name": "Fiana Parcelling", "notevalue": 3, "subname": "Guest (Twin)", "location": GuestRoomD, "points": 3, "type": "progression"},
-    // 13 diana parcelling
-    {"name": "Diana Parcelling", "notevalue": 3, "subname": "Guest (Twin)", "location": GuestRoomC, "points": 2, "type": "progression"},
+    // 12 fiana parcelling  move the register to block the door skipped in favor of Mirrored Manipulation
+    {},
+    // 13 diana parcelling skipped in favor of Mirrored Manipulation
+    {},
     // 14 robb derick
     {"name": "Robb Derick", "notevalue": 3, "subname": "Guest (Drunk)", "location": GuestHallway, "points": 3, "type": "progression"},
     // 15 william rockwell owners quarters
@@ -1129,8 +1165,9 @@ PeopleDossier= [
     {},
     // 18 not a notepage, related to fred moulding
     {},
-    // 19 Peter Schooner  steward
-    {"name": "Peter Schooner", "notevalue": 3, "subname": "Steward", "location": DiningHallway, "points": 2, "type": "progression"},
+    // 19 Peter Schooner  steward  skipped in favor of Suited to Sup
+    //{"name": "Peter Schooner", "notevalue": 3, "subname": "Steward", "location": DiningHallway, "points": 2, "type": "progression"},
+    {},
     // 20 Elizabeth Crownest (blackjack dealer)
     {},
     // 21 not a notepage, related to Poly Owning
@@ -1193,7 +1230,8 @@ PeopleDossier= [
     // 49 Crea Rockwell   skipped for casefile sapphire sacrifice
     {},
     // 50 jimmy tender
-    {"name": "Jimmy Tender", "notevalue": 5, "subname": "Miner", "location": SpecialGuestRoom, "points": 2, "type": "progression"},
+    //{"name": "Jimmy Tender", "notevalue": 5, "subname": "Miner", "location": SpecialGuestRoom, "points": 2, "type": "progression"},
+    {},
     // 51 not a notepage, related to William Rockwell
     {},
     // 52 Emilia Rockwell
@@ -1260,6 +1298,8 @@ function AchievementSpecialDossier(personID) {
     }
 }
 
+
+ 
 // loop through the PeopleDossier's to make cheevs
 // set id to peopleid as we loop through the elements since we need it to find the notebytes
 id = 0
@@ -1282,6 +1322,7 @@ for d in PeopleDossier {
 }
 
 
+
 // Fred has complex logic for the right trigger conditions & involves 2 locations
 achievement(
     title = "Dossier: " + PeopleDossier[FredMoulding]["name"] + " - " + PeopleDossier[FredMoulding]["subname"], 
@@ -1300,8 +1341,21 @@ achievement(
     trigger= playerPuzzleStatus() == 1 && locationid() == UprDeckPassageway && saveAndLoadStatus() == 0 &&
       personNoteByte(JohnCutter, NotebookPage) == 2 && prev(personNoteByte(JohnCutter, NotebookPage) < 2)
 )
+*/
 
-
+// Points variables to help keep scoring consistent
+Trivial             = 1
+Minor               = 2
+EasyPuzzle          = 3
+MediumPuzzle        = 4
+HardPuzzle          = 10
+SmallEvent          = 4
+MediumEvent         = 5
+LargeEvent          = 10
+MinorChallenge      = 3
+EasyChallenge       = 5
+MediumChallenge     = 10
+HardChallenge       = 25
 
 
 
@@ -1338,39 +1392,50 @@ function AchievementFunction(cheev) {
 
 Cheevos = [
     // Generic
-    { "kind": "genericpuzzle", "title": "Time Twister", "description": "Solve the clock puzzle", "location": House, "completionbit": ClockWound(), "points": 3, "type": "progression"},
+    { "kind": "genericpuzzle", "title": "Time Twister", "description": "Solve the clock puzzle", "location": House, "completionbit": ClockWound(), "points": EasyPuzzle, "type": "progression"},
     // turn on the lightbulb, just to show an easily missable light switch to get people used to looking at everything
-    { "kind": "generic", "title": "Lightbulb Moment", "description": "Always pay attention to your surroundings and turn on the basement light", "location": Basement, "completionbit":  BasementLightSwitchOn, "points": 1, "type": "missable"},
-    // Navigate the mine and pick up claudia's doll
-    { "kind": "genericrev", "title": "Casefile: 7/27/1910 Misery Mine", "description": "Complete Exploring the Abandoned Mine", "location": AbandonedMineC, "completionbit": IsSpawnedClaudiasDoll(), "points": 10, "type": "progression" },
+    { "kind": "generic", "title": "Lightbulb Moment", "description": "Always pay attention to your surroundings and turn on the basement light", "location": Basement, "completionbit":  BasementLightSwitchOn, "points": Trivial, "type": "missable"},
+    // ring around the sailor   get the ring and give it to john
+    { "kind": "genericrev", "title": "Casefile: 4/11/1913 Ring Around the Sailor", "description": "Help John Cutter find peace", "location": UprDeckPassageway, "completionbit": IsSpawnedJohnCutterAstral(), "points": SmallEvent, "type": "missable"},
+    // get the wire cutters, wire, rubber gloves(pair on a pier), fix the fusebox, flip the light in chart room
+    { "kind": "genericrev", "title": "Shedding Some Light on the Situation", "description": "Help Billy Bollard find peace", "location": ChartRoom, "completionbit": IsSpawnedBillyBollardAstral(), "points": LargeEvent, "type": "progression"},
+    // Navigate the mine and return claudia's doll
+    { "kind": "genericrev", "title": "Casefile: 7/27/1910 Misery Mine", "description": "Help Claudia find peace", "location": SpecialGuestRoom, "completionbit": IsSpawnedClaudiasDoll(), "points": LargeEvent, "type": "progression" },
     // pick up the dress suit and get clubbed
-    { "kind": "generic", "title": "A Suitable Outfit for Clubbing", "description": "Retrieve the dress suit", "location": SpecialGuestRoom, "completionbit": Clubbed(), "points": 2, "type": "progression"},
+    { "kind": "generic", "title": "A Suitable Outfit for Clubbing", "description": "Retrieve the dress suit", "location": SpecialGuestRoom, "completionbit": Clubbed(), "points": Trivial, "type": "progression"},
     // Get the prescription
-    { "kind": "genericrev", "title": "Casefile: 3/16/1912 A Peculiar Prescription", "description": "Complete Exploring the Laboratory", "location": Laboratory, "completionbit": IsSpawnedPrescription(), "points": 3, "type": "progression"},
+    { "kind": "generic", "title": "Casefile: 3/16/1912 A Peculiar Prescription", "description": "Find and show the prescription to the doctor", "location": MedicalOffice, "completionbit": PrescriptionDelivered(), "points": MediumEvent, "type": "progression"},
     // get the record from film booth and play it in the child room and open the chest
-    { "kind": "generic", "title": "Casefile: Witness to Reunion", "description": "Reunite the lost child with his mother and retrieve the key items", "location": ChildRoom, "completionbit": ChildChestOpen(), "points": 5, "type": "progression"},
+    { "kind": "generic", "title": "Casefile: Witness to Reunion", "description": "Reunite the lost child with his mother and retrieve the key items", "location": ChildRoom, "completionbit": ChildChestOpen(), "points": MediumPuzzle, "type": "progression"},
     // pour the antidote on the acid
-    { "kind": "genericrev", "title": "Rug Doctor", "description": "Clean the soiled carpet", "location": TheaterHallway, "completionbit": PouringAntidote(), "points": 3, "type": "progression"},
+    { "kind": "genericrev", "title": "Rug Doctor", "description": "Clean the soiled carpet", "location": TheaterHallway, "completionbit": PouringAntidote(), "points": EasyPuzzle, "type": "progression"},
+    // wear the suit and go to dine
+    { "kind": "generic", "title": "Suited to Sup", "description": "Be ushered to the dining hall", "location": DiningHallway, "completionbit": IsSpawnedStewardAstral(), "points": Minor, "type": "progression"},
     // Get Past the ghost in the stairwell,  insert the gear in crow, turn on the light
-    { "kind": "generic", "title": "Raven Ruckus", "description": "Eliminate the ghost with the help of a feathered friend", "location": Stairway, "completionbit": StairwayGhostDead(), "points": 4, "type": "progression"},
+    { "kind": "generic", "title": "Raven Ruckus", "description": "Eliminate the ghost with the help of a feathered friend", "location": Stairway, "completionbit": StairwayGhostDead(), "points": MediumPuzzle, "type": "progression"},
     // 
-    { "kind": "generic", "title": "A Placating Pendant", "description": "Free the spirit of the ghost lady", "location": TerraceLazarette, "completionbit": LadySpiritFreed(), "points": 2, "type": "progression"},
+    { "kind": "generic", "title": "A Placating Pendant", "description": "Free the spirit of the ghost lady", "location": TerraceLazarette, "completionbit": LadySpiritFreed(), "points": Minor, "type": "progression"},
     // set off the alarm and get the document off the bed
-    { "kind": "generic", "title": "An Alarming Situation", "description": "Get the probationers document", "location": CrewsQuartersB, "completionbit": GotSailorsDocument(), "points": 3, "type": "progression"},
+    { "kind": "generic", "title": "An Alarming Situation", "description": "Get the probationers document", "location": CrewsQuartersB, "completionbit": GotSailorsDocument(), "points": EasyPuzzle, "type": "progression"},
     // doors 1 and 2 open freely, the rest only open if the math adds up
-    { "kind": "generic", "title": "It’s All Starting To Add Up", "description": "Open locker number four", "location": CrewsQuartersA, "completionbit": OpenedLockerFour(), "points": 4, "type": "progression"},
+    { "kind": "generic", "title": "It’s All Starting To Add Up", "description": "Open locker number four", "location": CrewsQuartersA, "completionbit": OpenedLockerFour(), "points": MediumPuzzle, "type": "progression"},
+    // complete the twins rooms
+    { "kind": "generic", "title": "Mirrored Manipulation", "description": "Help Diana and Fiana find peace", "location": GuestRoomC, "completionbit": IsSpawnedFianaAstral(), "points": MediumPuzzle, "type": "progression"},
+    // make the drunk the right drink
+    
 
     // Casefiles
     // Watch the events of the steam locomotive take place.  Who are these people?
-    { "kind": "casefile", "casetitle": "4/12/1899 A Bloody Departure", "location": SteamLocomotive, "completionbit": SteamLocomotiveComplete(), "points": 5, "type": "progression" },
+    { "kind": "casefile", "casetitle": "4/12/1899 A Bloody Departure", "location": SteamLocomotive, "completionbit": SteamLocomotiveComplete(), "points": MediumEvent, "type": "progression" },
     // Get the rubber gloves from the Pier
-    { "kind": "casefile", "casetitle": "4/10/1913 A Pair on a Pier", "location": Pier, "completionbit": PierComplete(), "points": 3, "type": "progression"},
+    { "kind": "casefile", "casetitle": "4/10/1913 A Pair on a Pier", "location": Pier, "completionbit": PierComplete(), "points": SmallEvent, "type": "progression"},
     // Watch the cutscene at the castle after speaking with arthur & hilda
-    { "kind": "casefile", "casetitle": "11/26/1469 Medieval Murdering Mercenary", "location": CastleTerrace, "completionbit": CastleComplete(), "points": 3, "type": "progression"},
+    { "kind": "casefile", "casetitle": "11/26/1469 Medieval Murdering Mercenary", "location": CastleTerrace, "completionbit": CastleComplete(), "points": SmallEvent, "type": "progression"},
     // retrieve the pendant and escape the cemetery (hopefully with the flying fish plate)
-    { "kind": "casefile", "casetitle": "12/29/1910 Creep in a Crypt", "location": CemeteryCryptA, "completionbit": EscapedCemetery(), "points": 10, "type": "progression"},
+    { "kind": "casefile", "casetitle": "12/29/1910 Creep in a Crypt", "location": CemeteryCryptA, "completionbit": EscapedCemetery(), "points": LargeEvent, "type": "progression"},
     // complete the events of the house
-    { "kind": "casefile", "casetitle": "2/9/1913 Sapphire Sacrifice", "location": PastHouseOutside, "completionbit": CompletedPastHouseOutside(), "points": 4, "type": "progression"},
+    { "kind": "casefile", "casetitle": "2/9/1913 Sapphire Sacrifice", "location": PastHouseOutside, "completionbit": CompletedPastHouseOutside(), "points": MediumEvent, "type": "progression"},
+
     
 ]
 
@@ -1409,11 +1474,11 @@ SailorsDocuments = 39
 
 Books = [
     // red book is not required to be picked up, so i gave it 1 more point
-    {"name": BookNames[RedBook],          "numpages": 9, "itemid": RedBook,          "points": 3},
-    {"name": BookNames[CometBook],        "numpages": 3, "itemid": CometBook,        "points": 2},
-    {"name": BookNames[Prescription],     "numpages": 3, "itemid": Prescription,     "points": 2},
-    {"name": BookNames[OldBook],          "numpages": 9, "itemid": OldBook,          "points": 2},
-    {"name": BookNames[SailorsDocuments], "numpages": 3, "itemid": SailorsDocuments, "points": 2},
+    {"name": BookNames[RedBook],          "numpages": 9, "itemid": RedBook,          "points": Minor},
+    {"name": BookNames[CometBook],        "numpages": 3, "itemid": CometBook,        "points": Trivial},
+    {"name": BookNames[Prescription],     "numpages": 3, "itemid": Prescription,     "points": Trivial},
+    {"name": BookNames[OldBook],          "numpages": 9, "itemid": OldBook,          "points": Trivial},
+    {"name": BookNames[SailorsDocuments], "numpages": 3, "itemid": SailorsDocuments, "points": Trivial},
 ]
 
 for b in Books {
@@ -1431,9 +1496,9 @@ for m in range(0,9) {
 // measured value is number of map bytes * 8 (for 8 bits)
 // 10 map bytes * 8 bits = 80
 achievement(
-    title = "Fully Mapped", points = 25,
+    title = "Fully Mapped", points = MediumChallenge,
     description = "Achieve 100% map completion",
-    id = 444146, badge = "00000", published = "7/1/2024 2:23:39 AM", modified = "8/13/2024 8:03:11 PM",
+    id = 444146, badge = "00000",
     trigger = gamecontinuedstate() != 0 && saveAndLoadStatus() == 0 &&
               sum_of(MapArray, (m) => prev(m)) < length(MapArray) * 8 &&
               measured(sum_of(MapArray, (m) => m) == length(MapArray) * 8, format="percent")
@@ -1476,12 +1541,12 @@ ReadingTooltip            = 23
 
 
 
-
+/*
 function HouseInteractionSlot(slotID) {
     return (measured
 	         (tally(15, 			  
-                    once(ConfigSlotInteractionID(slotID) == HousePolicemanIntro),
-                    once(ConfigSlotInteractionID(slotID) == HousePoliceman),
+                    once(ConfigSlotInteractionID(0) == HousePolicemanIntro),
+                    once(ConfigSlotInteractionID(0) == HousePoliceman),
                     once(ConfigSlotInteractionID(slotID) == HouseFirstDoor),
                     once(ConfigSlotInteractionID(slotID) == HouseBedroomDoor),                   
                     once(ConfigSlotFunctionID(slotID) == ReadingTooltip && 
@@ -1510,17 +1575,44 @@ function HouseInteractionSlot(slotID) {
                 )
            )
 }
+*/
 
 
 // possibly needs alts for if the clock hands show up in a slot other than 3, but it hasn't happened to me in testing
 // player comes back to the house after completing the steam locomotive to head into the basement
 // only show trigger if in the house and steam locomotive not complete
 
+//achievement(
+//    title = "A Thorough Investigation", points = 4, type="missable",
+//    description = "Investigate everything in the house before leaving the area",
+//    trigger = (__ornext(playerPuzzleStatus() == 1 || playerPuzzleStatus() == 0 && playerstanding() == 1) && SteamLocomotiveComplete() == 0 && never(locationid() != House) && ) &&
+//              (HouseInteractionSlot(0) || HouseInteractionSlot(1) || HouseInteractionSlot(2) || trigger_when(always_false()))
+//)
+
 achievement(
-    title = "A Thorough Investigation", points = 4, type="missable",
+    title = "A Thorough Investigation", points = EasyChallenge, type="missable",
     description = "Investigate everything in the house before leaving the area",
-    trigger = (__ornext(playerPuzzleStatus() == 1 || playerPuzzleStatus() == 0 && playerstanding() == 1) && SteamLocomotiveComplete() == 0 && never(locationid() != House) ) &&
-              (HouseInteractionSlot(0) || HouseInteractionSlot(1) || HouseInteractionSlot(2) || trigger_when(always_false()))
+    id = 461607, badge = "557505",
+    trigger = (__ornext(playerPuzzleStatus() == 1 || playerPuzzleStatus() == 0 && playerstanding() == 1) && never(locationid() != House)) &&  SteamLocomotiveComplete() == 0 &&
+              once(ConfigSlotInteractionID(0) == HousePolicemanIntro) &&
+              (trigger_when(measured(tally(15, 
+                    once(ConfigSlotInteractionID(0) == HousePoliceman),
+                    once(ConfigSlotInteractionID(0) == HouseFirstDoor),
+                    once(ConfigSlotInteractionID(0) == HouseBedroomDoor),                   
+                    once(ConfigSlotFunctionID(0) == ReadingTooltip && ConfigSlotInteractionID(0) == HouseFireplace),
+                    once(ConfigSlotFunctionID(0) == ReadingTooltip && ConfigSlotInteractionID(0) == HouseBurntBookshelf1),
+                    once(ConfigSlotFunctionID(0) == ReadingTooltip && ConfigSlotInteractionID(0) == HouseBurntBookshelf2),
+                    once(ConfigSlotFunctionID(0) == ReadingTooltip && ConfigSlotInteractionID(0) == HouseLamp),
+                    once(ConfigSlotFunctionID(0) == ReadingTooltip && ConfigSlotInteractionID(0) == HouseBurntChair),
+                    once(ConfigSlotFunctionID(0) == ReadingTooltip && ConfigSlotInteractionID(0) == HouseWindingKey),
+                    once(ConfigSlotFunctionID(0) == ReadingTooltip && ConfigSlotInteractionID(0) == HouseBed),
+                    once(ConfigSlotFunctionID(0) == ReadingTooltip && ConfigSlotInteractionID(0) == HouseGrandfatherClock),
+                    once(ConfigSlotInteractionID(0) == HouseOpenedClock && ConfigSlotFunctionID(3) == ReadingTooltip && ConfigSlotInteractionID(3) == MinuteHand),
+                    once(ConfigSlotInteractionID(0) == HouseOpenedClock && ConfigSlotFunctionID(3) == ReadingTooltip && ConfigSlotInteractionID(3) == HourHand),
+                    once(ConfigSlotInteractionID(0) == HouseOpenedClock && ConfigSlotFunctionID(3) == ReadingTooltip && ConfigSlotInteractionID(3) == WindingKeyhole),
+                    once(bit3(currentLocationBitflags(0)) > prev(bit3(currentLocationBitflags(0))))),
+                    format="percent"
+                )))
 )
 
 // Basement puzzle
@@ -1532,7 +1624,7 @@ Painting     = 0x103
 PaintingClue = 0x8018deec
 
 achievement(
-    title = "Life Imitates Art", points = 3, type="missable",
+    title = "Life Imitates Art", points = Minor, type="missable",
     description = "View the clue then solve the puzzle",
     trigger = playerPuzzleStatus() == 1 && never(locationid() != Basement) &&
               any_of(range(0,9), (id) => 
@@ -1551,10 +1643,11 @@ LightSwitchClue2 = 0x8018fa8c
 LightSwitchClue3 = 0x8018fb5c
 
 achievement(
-    title = "Breadcrumbs to Illumination", points = 3, type="missable",
+    title = "Breadcrumbs to Illumination", points = MinorChallenge, type="missable",
     description = "In one session without saving or loading, hear the clue then turn on the secret lightswitch",
-    trigger = playerPuzzleStatus() == 1 && locationid() == prev(locationid()) && once(locationid() == TheaterHallway && SecretLightswitchOn() == 0) && 
-              never(GameLoaded()) && never(GameSaved()) &&
+    id = 491963, badge = "557564",
+    trigger = (playerPuzzleStatus() == 1 && locationid() == prev(locationid()) && once(SecretLightswitchOn() == 0) && 
+              never(GameLoaded()) && never(GameSaved())) &&
               (  
                 any_of(range(0,9), (id) => 
                   (once(locationid() == Casino && ConfigSlotFunctionID(id) == Dialogue && ConfigSlotInteractionID(id) == CasinoBoss && ConfigSlotDataPTR(id) == LightSwitchClue1) &&
@@ -1569,7 +1662,7 @@ achievement(
 )
 
 achievement(
-    title = "In the Pale Moonlight", points = 5, type="missable",
+    title = "In the Pale Moonlight", points = EasyChallenge, type="missable",
     description = "In one session without saving or loading, hear the clue and complete the pool",
     trigger = playerPuzzleStatus() == 1 && once(locationid() == LwrDeckTerrace && HeardMidnightClue() > prev(HeardMidnightClue()) && PoolComplete() == 0) && never(GameLoaded()) && never(GameSaved()) &&
               trigger_when((locationid() == Pool && PoolComplete() > prev(PoolComplete())))
@@ -1577,7 +1670,7 @@ achievement(
 
 // speak to hilda rockwell then clear the stairwell
 achievement(
-    title = "Diversion Directed", points = 3, type="missable",
+    title = "Diversion Directed", points = EasyChallenge, type="missable",
     description = "In one session without saving or loading, hear the clue and banish the stairway ghost",
     trigger = playerPuzzleStatus() == 1 && once(locationid() == GrandDining && HeardDiversionClue() > prev(HeardDiversionClue()) && StairwayGhostDead() == 0) && never(GameLoaded()) && never(GameSaved()) &&
               trigger_when((locationid() == Stairway && StairwayGhostDead() > prev(StairwayGhostDead())))
@@ -1592,7 +1685,7 @@ SignTooltip = 0x8018f9ec
 // view the clue and start the generator
 // the sign is very blurry so the cheevo title has dots to simulate missing letters
 achievement(
-    title = "Pow.r th. Poo. P.mp", points = 4, type="missable",
+    title = "Pow.r th. Poo. P.mp", points = MediumPuzzle, type="missable",
     description = "View the instruction tooltip and start the pool pump",
     trigger = playerPuzzleStatus() == 1 && never(locationid() != TerraceLazarette) && once(PoolPumpStarted() == 0) &&
                 any_of(range(0,9), (id) => 
@@ -1605,22 +1698,25 @@ achievement(
 
 
 achievement(
-    title = "Getting Organized", points = 2,
+    title = "An Investigator Needs His Notebook", points = Trivial,
     description = "Retrieve the Leather Organizer", type="missable",
-    trigger = playerPuzzleStatus() == 1 && locationid() == 3 && saveAndLoadStatus() == 0 && leatherOrganizer() > prev(leatherOrganizer())
+    id = 489435, badge = "557528",
+    trigger = playerPuzzleStatus() == 1 && locationid() == CaptainsCabin && saveAndLoadStatus() == 0 && leatherOrganizer() > prev(leatherOrganizer())
 )
 
 achievement(
-    title = "Too Bad There is No One to Ask for Directions", points = 3,
-    description = "Retrieve the Ship Map", type="missable",
+    title = "Too Bad There is No One to Ask for Directions", points = Minor,
+    description = "Retrieve the ship map", type="missable",
+    id = 490705,
     trigger = playerPuzzleStatus() == 1 && locationid() == 0 && saveAndLoadStatus() == 0 && shipMap() > prev(shipMap())
 )
 
 // Fusebox does not flip a bit in the current location, but instead flips a bit in the adjacent room (0x4=Compartment)
 
 achievement(
-    title = "OSHA Approved Electrician", points = 3,
+    title = "O.S.H.A. Approved", points = EasyChallenge,
     description = "Fix the fusebox without getting zapped", type="missable",
+    id = 490703,
     trigger = (
               once(locationid() == UprDeckPassagewayInside && prev(locationid() != UprDeckPassagewayInside)) &&
               once(locationid() == UprDeckPassagewayInside && FuseBoxWired() == 0) &&
@@ -1633,8 +1729,9 @@ achievement(
 // happens automatically after speaking with the ghost captain and entering the upr deck passageway
 
 achievement(
-    title = "A G..G..G..Ghost!", points = 2, type="progression",
+    title = "A G..G..G..Ghost!", points = Minor, type="progression",
     description = "Meet a ghostly girl and mysteriously get rescued",
+    id = 489270, badge = "557529",   
     trigger = playerPuzzleStatus() == 1 && locationid() == UprDeckPassageway && saveAndLoadStatus() == 0 &&
               EncounteredClaudia() > prev(EncounteredClaudia())
 )
@@ -1647,18 +1744,19 @@ achievement(
 ExitDoor = 3
 
 achievement(
-    title = "Grabbed With Gusto", points = 3, type="missable",
+    title = "Grabbed With Gusto", points = MinorChallenge, type="missable",
     description = "Retrieve the wire cutters and exit the room without being hit by the ghost",
-    trigger = playerPuzzleStatus() == 1 && never(locationid() != 4) && saveAndLoadStatus() == 0 && once(IsSpawnedWireCutter() == 1) &&
+    id = 489271,
+    trigger = disable_when(playerCondition() < prev(playerCondition()), until=locationid() != 4) && 
+              playerPuzzleStatus() == 1 && never(locationid() != 4) && saveAndLoadStatus() == 0 && once(IsSpawnedWireCutter() == 1) &&
               trigger_when(
                 once(IsSpawnedWireCutter() < prev(IsSpawnedWireCutter())) &&
                 (ConfigSlotInteractionID(0) == ExitDoor || ConfigSlotInteractionID(1) == ExitDoor || ConfigSlotInteractionID(2) == ExitDoor)
-              ) &&
-              never(playerCondition() < prev(playerCondition())) 
+              )          
 )
 
 achievement(
-    title = "When You Wish Upon a Star", points = 5, type="progression",
+    title = "When You Wish Upon a Star", points = MediumEvent, type="progression",
     description = "Visit the Medium",
     trigger = playerPuzzleStatus() == 1 && saveAndLoadStatus() == 0 && never(locationid() != ObservatoryB) &&
               once(VisitedMedium() > prev(VisitedMedium())) &&
@@ -1674,23 +1772,33 @@ achievement(
 // also worth noting claudia only appears in the pilothouse when it's past 10-11pm 
 // missable if claudia's quest is completed before this task.
 
+// need to add 0xb hallway
+//             0xf  guest room a
+//             0x10 guest room b
+
+// she spawns in guest hallway 0xc after the drunk is cleared, but there is no lightswitch in this area, its in the previous area
+
+function ClaudiaComplete() => bit7(locationBitflags(SpecialGuestRoom,0))
+
 achievement(
-    title = "Ghost Hunter: Claudia", points = 10, type="missable",
-    description = "Chase Claudia out of every location they are haunting before completing their quest",
-    trigger = playerPuzzleStatus() == 1 && saveAndLoadStatus() == 0 && bit7(locationBitflags(SpecialGuestRoom,0)) == 0 &&
-        trigger_when(measured(
+    title = "Ghost Hunter: Claudia", points = MediumChallenge, type="missable",
+    description = "Chase Claudia out of every possible location they are haunting before completing their quest",
+    trigger = playerPuzzleStatus() == 1 && saveAndLoadStatus() == 0 && ClaudiaComplete() == 0 && EncounteredClaudia() == 1 &&
+        measured(
             tally(3, 
+                // bitmask 0xE0 to target bits 7,6,5 when claudia is present
                 once((UprDeckPassagewayInsideLightOn > prev(UprDeckPassagewayInsideLightOn) && locationid() == UprDeckPassagewayInside &&
-                  ConfigSlotInteractionIDbyte(0) == 0xfa && (dword(locationBitflags(UprDeckPassagewayInside,2)) & 0x7F) > 1)
+                  ConfigSlotInteractionIDbyte(0) == 0xfa && (dword(locationBitflags(UprDeckPassagewayInside,2)) & 0xE0) > 1)
                 ),
+                // bitmask 0xA0  to target bits 7,5  when claudia is present
                 once((UprDeckCompartmentLightOn > prev(UprDeckCompartmentLightOn) && locationid() == UprDeckCompartment &&
-                  ConfigSlotInteractionIDbyte(2) == 0xf0 && (dword(locationBitflags(UprDeckCompartment,1)) & 0x7F) > 1)
+                  ConfigSlotInteractionIDbyte(2) == 0xf0 && (dword(locationBitflags(UprDeckCompartment,1)) & 0xA0) > 1)
                 ),
                 once((PilothouseLightOn > prev(PilothouseLightOn) && locationid() == Pilothouse &&
                   ConfigSlotInteractionIDbyte(1) == 0xfa && (dword(locationBitflags(Pilothouse,3)) & 0xFC) > 1)
                 )
             )
-        ))
+        )
 )
         
 
@@ -1716,7 +1824,7 @@ TICKETS = [
 // never(saveAndLoadStatus() != 0) makes sure we won't count any hits until after a game is saved or loaded
 // never((gamecontinuedstate() != prev(gamecontinuedstate()))) catches when a new game starts or is continued from the main menu
 achievement(
-    title = "Ticket Master", points = 10, type="missable",
+    title = "Ticket Master", points = MediumChallenge, type="missable",
     description = "Collect every claim ticket before completing the casino",
     trigger = disable_when(playerPuzzleStatus() != 1, until=playerPuzzleStatus() == 1) && unless(CasinoClosed() == 1) && saveAndLoadStatus() == 0 &&
               measured(
@@ -1746,7 +1854,7 @@ CURES = [
 // this is the same but with cure potions
 
 achievement(
-    title = "Master of Cures", points = 10, type="missable",
+    title = "Master of Cures", points = HardChallenge, type="missable",
     description = "Collect Every cure potion",
     trigger = disable_when(playerPuzzleStatus() != 1, until=playerPuzzleStatus() == 1) && saveAndLoadStatus() == 0 &&
               measured(
@@ -1757,9 +1865,29 @@ achievement(
 )
 
 
-// rework this to all the paintings in game ?
+
+// There are 50 people to meet, check all the slots with hitcounts so we can keep a measured
+
+function PersonMetByte(numPeople) => byte(PeopleMetAddr + numPeople - 1)
+
+TotalNumberOfPeople = 50
+
 achievement(
-    title = "Art Aficianado", points = 2,
+    title = "People Person", points = MediumChallenge, type="missable",
+    description = "Meet every person in the game",
+    trigger = playerPuzzleStatus() == 1 && saveAndLoadStatus() == 0 && 
+    measured(tally_of(range(1,TotalNumberOfPeople), TotalNumberOfPeople, (i) => once(PersonMetByte(i) != 0xff))) &&
+    prev(PersonMetByte(TotalNumberOfPeople) == 0xff)
+)
+
+
+
+// rework this to all the paintings in game ?
+
+// desk in guest room A has the clue to check the paintings for the drunk guy
+
+achievement(
+    title = "Art Aficianado", points = Minor,
     description = "Interact with every painting in the lounge",
     trigger = playerPuzzleStatus() == 1 &&
               ((trigger_when(tally(4, (once(once(locationid() == 6) && byte(0x1D8D10) == 22)),
@@ -1787,7 +1915,7 @@ achievement(
 // Library
 
 achievement(
-    title = "This Is a Stealth Game?", points = 2, type="missable",
+    title = "This Is a Stealth Game?", points = Minor, type="missable",
     description = "Retrieve the book without getting caught by the receptionist",
     trigger = playerPuzzleStatus() == 1 && locationid() == Library &&
               disable_when(
@@ -1798,7 +1926,7 @@ achievement(
 // Mess hall
 
 achievement(
-    title = "Between a King and a Hard Place", points = 4,
+    title = "Between a King and a Hard Place", points = EasyChallenge,
     description = "Escape the mess room without being hit by the king",
     trigger = playerPuzzleStatus() == 1 && once(locationid() == 0x1a && locationid() != prev(locationid())) &&
               locationid() == prev(locationid()) &&
@@ -1809,7 +1937,7 @@ achievement(
 // cemetery not complete
 
 achievement(
-    title = "Dodged a Dead End", points = 5,
+    title = "Dodged a Dead End", points = MediumChallenge,
     description = "Escape the cemetery without being hit by William",
     trigger = playerPuzzleStatus() == 1 && once(locationid() == CemeteryCryptB  ) &&
 
@@ -1821,14 +1949,15 @@ achievement(
 // Observatory 
 
 achievement(
-    title = "Give the Medium an Astral piece", points = 3,
-    description = "",
-    trigger = playerPuzzleStatus() == 1 && locationid() == prev(locationid()) && locationid() == 62 &&
-              bit1(locationid() * 32 + 0x1BCE58) > prev(bit1(locationid() * 32 + 0x1BCE58))
+    title = "An Astral Exchange", points = Minor,
+    description = "Give an astral piece to the medium",
+    id = 490706, 
+    trigger = playerPuzzleStatus() == 1 && locationid() == prev(locationid()) && locationid() == ObservatoryB &&
+              bit1(locationBitflags(ObservatoryB,0)) > prev(bit1(locationBitflags(ObservatoryB,0)))
 )
 
 achievement(
-    title = "An Ear for Music", points = 10,
+    title = "An Ear for Music", points = MediumChallenge,
     description = "solve the organ without making a mistake ",
     trigger = once((playerPuzzleStatus() == 1 || playerPuzzleStatus() == 0) && playerstanding() == 1 &&
                   locationid() == 41 && locationid() != prev(locationid())
@@ -1850,7 +1979,7 @@ CasinoBossKickOut3  = 0x80190ff4  // transitioned to black screen
 CasinoBossKickedOut = 0x80191020  // transitioning to hallway
 
 achievement(
-    title = "You Don’t Have To Go Home but You Can’t Stay Here", points = 2, type = "missable",
+    title = "You Don’t Have To Go Home but You Can’t Stay Here", points = Minor, type = "missable",
     description = "Overstay your welcome and get kicked out of the casino",
     trigger = playerPuzzleStatus() == 1 && never(locationid() != Casino) &&
               any_of(range(0,9), (id) => 
@@ -1863,7 +1992,7 @@ achievement(
 )
 
 achievement(
-    title = "Play That Funky Music", points = 10, type="missable",
+    title = "Play That Funky Music", points = EasyChallenge, type="missable",
     description = "After getting all 26 astral pieces, play some music on the jukebox",
     trigger = once((playerPuzzleStatus() == 1 || playerPuzzleStatus() == 0) && playerstanding() == 1 &&
                   locationid() == 31 && locationid() != prev(locationid())
@@ -1872,19 +2001,44 @@ achievement(
               never(locationid() != 31)
 )
 
-achievement(
-    title = "Slot Success", points = 5,
-    description = "Win at slots",
-    trigger = playerPuzzleStatus() == 1 && (locationid() == 31 && dword(CodeFlow) == 201) &&
-              (byte(0x0A29E4) == 5 && word(0x0A29C0) == 511)
-)
+function ptrToCasinoPayout() => tbyte(0x09FA30)
+
+PlayingSlots    = 0xc9
+SlotWin         = 0x200
+SlotJackpot     = 0x20a
 
 achievement(
-    title = "Wheel of Fortune", points = 5,
-    description = "Win at roulette",
-    trigger = playerPuzzleStatus() == 1 && (locationid() == 31 && dword(CodeFlow) == 200) &&
-              byte(tbyte(0x09FA2C) + 0x000048) > 0
+    title = "Slot Success", points = EasyChallenge,
+    description = "Win at slots",
+    trigger = playerPuzzleStatus() == 1 && locationid() == Casino && CodeFlow() == PlayingSlots &&
+              ((word(ptrToCasinoPayout()) == SlotWin) || (word(ptrToCasinoPayout()) == SlotJackpot))
 )
+
+// $1D2A50: [16-bit] roulette game status
+function rouletteStatus() => word(0x1D2A50)
+
+// $1D2A52: [16-bit] roulette chips bet
+function rouletteChipsBet() => word(0x1D2A52)
+
+PlayingRoulette     = 0xc8
+RouletteOuterSpin   = 0x101
+RouletteInnerSpin   = 0x201
+RoulettePayout      = 0x202
+
+// This cheevo adds 65535 (to prevent overflow), subtracts chips bet from chips won, and makes sure that value is greater than 2
+// This prevents a user from just betting for example 9 odd, 9 even and technically winning even though you win 0 actual chips
+
+achievement(
+    title = "Wheel of Fortune", points = MinorChallenge,
+    description = "Win at least 3 more chips than you bet while playing a single round of roulette",
+    id = 492103, badge = "557731", published = "1/15/2025 12:47:18 AM", modified = "1/15/2025 4:24:01 AM",
+    trigger = playerPuzzleStatus() == 1 && locationid() == 31 && CodeFlow() == PlayingRoulette && rouletteStatus() == RoulettePayout &&
+              prev(rouletteStatus()) == RouletteInnerSpin && (word(tbyte(0x09FA2C) + 0x000048) - rouletteChipsBet()) > 2
+)
+
+
+PlayingBlackjack   = 0xca
+
 
 // Theater
 
@@ -1900,8 +2054,9 @@ MovieTheater4   = 0x8018ff10 // "I'm sorry.. so terribly sorry"
 
 
 achievement(
-    title = "This Theater Has Terrible Service", points = 2, type="missable",
+    title = "This Theater Has Terrible Service", points = Minor, type="missable",
     description = "Attempt to see a film",
+    id = 486665, 
     trigger = playerPuzzleStatus() == 1 && never(locationid() != Theater) && filmEngineerGone() == 0 && 
               // the first time you enter the theater the "In theater entrance" bit is not set for some reason
               // so this ornext covers both cases where you are in the front room
@@ -1945,7 +2100,7 @@ HORSES = [
 ]
 
 achievement(
-    title = "Shine On You Crazy Diamond", points = 2, type = "missable",
+    title = "Shine On You Crazy Diamond", points = Minor, type = "missable",
     description = "Ride the carousel before locating the missing item.",
     trigger = playerPuzzleStatus() == 1 && locationid() == AmusementParkCarousel && IsSpawnedAmusementParkEngagementRing() == 1 &&
             __ornext(any_of(range(0,9), (id) => any_of(HORSES, (h) => ConfigSlotInteractionID(id) == h)))
@@ -1968,21 +2123,21 @@ function ptrResultsDisplay()  => dword(0x1ffe8c)
 function ResultsRating()      => dword(0x1ffe90)
 
 achievement(
-    title = "ESPer", points = 25,
+    title = "ESPer", points = HardChallenge,
     description = "Beat the game with an ESPer rating",
     trigger = resultsOnScreen() && ptrResultsDisplay() == ptrResultsRating && 
               ResultsRating() == Esper && prev(ResultsRating()) != Esper
 )
 
 achievement(
-    title = "Genius", points = 10,
+    title = "Genius", points = MediumChallenge,
     description = "Beat the game with a Genius or higher rating",
     trigger = resultsOnScreen() && ptrResultsDisplay() == ptrResultsRating && 
               (ResultsRating() == Esper && prev(ResultsRating()) != Esper) || 
               (ResultsRating() == Genius && prev(ResultsRating()) != Genius)
 )
 achievement(
-    title = "Superior", points = 5,
+    title = "Superior", points = EasyChallenge,
     description = "Beat the game with a Superior or higher rating",
     trigger = resultsOnScreen() && ptrResultsDisplay() == ptrResultsRating &&  
               (ResultsRating() == Esper && prev(ResultsRating()) != Esper) || 
@@ -1997,7 +2152,8 @@ achievement(
 achievement(
     title = "Conclusion: A Dank Destination", points = 0,
     description = "Get a game over",
-    trigger = playerPuzzleStatus() == 1 && once(playerCondition() == 0) && (dword(CodeFlow) == 57 && gameOver() == 1 && prev(gameOver() != 1)) &&
+    id = 473928,  
+    trigger = playerPuzzleStatus() == 1 && once(playerCondition() == 0) && (CodeFlow() == 57 && gameOver() == 1 && prev(gameOver() != 1)) &&
               never(locationid() != 57)
 )
 
@@ -2005,31 +2161,35 @@ achievement(
 achievement(
     title = "Conclusion: Lost at Sea", points = 0,
     description = "Fail to escape the Orpheus before time runs out",
-    trigger = playerPuzzleStatus() == 1 && (dword(CodeFlow) == 0xd4 && resultsOnScreen() && resultsNotOnScreen())
+    id = 473924, 
+    trigger = playerPuzzleStatus() == 1 && (CodeFlow() == 0xd4 && resultsOnScreen() && resultsNotOnScreen())
 )
 
 // Best ending
 achievement(
-    title = "Conclusion: Angel of the Orpheus", points = 25, type="win_condition",
+    title = "Conclusion: Angel of the Orpheus", points = HardChallenge, type="win_condition",
     description = "Acquire all 26 astral pieces and refuse the offer",
-    trigger = playerPuzzleStatus() == 1 && once(dword(CodeFlow) == 74) && dword(CodeFlow) == 210 &&
-              prev(dword(CodeFlow)) == 220 && never(locationid() == 0)
+    id = 473925,  
+    trigger = playerPuzzleStatus() == 1 && once(CodeFlow() == 74) && CodeFlow() == 210 &&
+              prev(CodeFlow()) == 220 && never(locationid() == 0)
 )
 
 // evil ending
 achievement(
-    title = "Conclusion: Deal with the Devil", points = 25, type="win_condition",
+    title = "Conclusion: Deal with the Devil", points = HardChallenge, type="win_condition",
     description = "Acquire all 26 astral pieces and accept the offer",
-    trigger = playerPuzzleStatus() == 1 && once(dword(CodeFlow) == 211) &&
+    id = 473926,   
+    trigger = playerPuzzleStatus() == 1 && once(CodeFlow() == 211) &&
               (locationid() == 55 && bit2(locationid() * 2 + 0x1A4A68) > prev(bit2(locationid() * 2 + 0x1A4A68))) &&
               never(locationid() == 0)
 )
 
 // mysterious ending where the knife shows up in the trunk of the car, uhoh. 
 achievement(
-    title = "Conclusion: A Sticking Point", points = 10, type="win_condition",
+    title = "Conclusion: A Sticking Point", points = MediumChallenge, type="win_condition",
     description = "Complete the game imperfectly",
-    trigger = playerPuzzleStatus() == 1 && once(prev(dword(CodeFlow)) == 74 && dword(CodeFlow) == 211) &&
+    id = 473927, 
+    trigger = playerPuzzleStatus() == 1 && once(prev(CodeFlow()) == 74 && CodeFlow() == 211) &&
               (locationid() == 87 && bit0(locationid() * 2 + 0x1A4A68) > prev(bit0(locationid() * 2 + 0x1A4A68))) &&
               never(locationid() == 0)
 )
@@ -2085,15 +2245,15 @@ SpecialLookup = {
 }
 
 
-rich_presence_conditional_display((dword(CodeFlow) == 0xc8 || dword(CodeFlow) == 0xc9 || dword(CodeFlow) == 0xca), "🤑-[ {0} 🥮:{1} ]-🤑",
-    rich_presence_lookup("Special", dword(CodeFlow), SpecialLookup),
+rich_presence_conditional_display((CodeFlow() == 0xc8 || CodeFlow() == 0xc9 || CodeFlow() == 0xca), "🤑-[ {0} 🥮:{1} ]-🤑",
+    rich_presence_lookup("Special", CodeFlow(), SpecialLookup),
     rich_presence_value("Number", casinoGameChips())
 )
 
-rich_presence_conditional_display((dword(CodeFlow) == 0xdc || dword(CodeFlow) == 0xd2 || dword(CodeFlow) == 0xd3 || dword(CodeFlow) == 0xcd ||
-        dword(CodeFlow) == 0xd4
+rich_presence_conditional_display((CodeFlow() == 0xdc || CodeFlow() == 0xd2 || CodeFlow() == 0xd3 || CodeFlow() == 0xcd ||
+        CodeFlow() == 0xd4
     ), "🎬-[ {0} {1} ]-🎬",
-    rich_presence_lookup("Special", dword(CodeFlow), SpecialLookup),
+    rich_presence_lookup("Special", CodeFlow(), SpecialLookup),
     rich_presence_lookup("VideoFile", filenamePointerForCdRomVideoPlaying(), VideoFileLookup)
 )
 
@@ -2221,6 +2381,24 @@ rich_presence_conditional_display(gametime() == 0 && playerPuzzleStatus() == 0, 
 rich_presence_display("This should never be seen")
 
 
+
+
+leaderboard(
+    title="Blackjack Win Streak",
+    description="Win as many consecutive hands of blackjack that you can.",
+    id=124793,
+    start=CodeFlow() == PlayingBlackjack && 
+              tally(2, (byte(0x0A3A68) == 2 && prev(byte(0x0A3A68)) != 2 && byte(0x0A3BBD) > byte(0x0A3BBE))) &&
+              never(prev(byte(0x09FA21)) < byte(0x09FA21)),
+    cancel=locationid() != Casino,
+    submit=__ornext((byte(0x0A3A68) == 2 && byte(0x09FA21) == 1 && prev(byte(0x09FA21)) == 0) || CodeFlow() != PlayingBlackjack),
+    value=measured(tally(0, once(always_true()),
+                 (byte(0x0A3A68) == 2 && prev(byte(0x0A3A68)) != 2 && byte(0x0A3BBD) > byte(0x0A3BBE)), always_false())
+             ),
+    format="VALUE",
+    lower_is_better=false
+    
+)
 
 
 
