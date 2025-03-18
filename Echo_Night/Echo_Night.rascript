@@ -1176,9 +1176,9 @@ function itemNotePage() => byte(0x1DD704)
 
 function EnteredRoom(location, via) {
     if via != 0 {
-        return once(LocationID() == location && prev(locationid() == via))
+        return once(LocationID() == location && prev(LocationID() == via))
     } else {
-        return once(LocationID() == location && prev(locationid() != location))
+        return once(LocationID() == location && prev(LocationID() != location))
     }
 }
 
@@ -1518,7 +1518,7 @@ achievement(
     title = "Breadcrumbs to Illumination", points = MinorChallenge, type="missable",
     description = "In one session without saving or loading, hear the clue then turn on the secret lightswitch",
     id = 491963,
-    trigger = (GameContinuedState() > 0 && LocationID() == prev(locationid()) && currentConfigSlotAddr() == prev(currentConfigSlotAddr()) && once(SecretLightswitchOn() == 0) &&
+    trigger = (GameContinuedState() > 0 && LocationID() == prev(LocationID()) && currentConfigSlotAddr() == prev(currentConfigSlotAddr()) && once(SecretLightswitchOn() == 0) &&
               never(GameLoaded()) && never(GameSaved())) &&
               (  
                 once(LocationID() == Casino && currentFunctionID() == Dialogue  && currentInteractionID() == CasinoBoss && currentDataPTR() == LightSwitchClue1) &&
@@ -2052,7 +2052,7 @@ achievement(
     title = "Between a King and a Hard Place", points = EasyChallenge,
     description = "Escape the mess room without being hit by the king",
     trigger = GameRunning() &&
-              once(LocationID() == MessRoom && prev(locationid() == DiningRoomGalley)) &&
+              once(LocationID() == MessRoom && prev(LocationID() == DiningRoomGalley)) &&
               once(currentInteractionID() == King) &&
               trigger_when(TalkedToFatherMessRoom() > prev(TalkedToFatherMessRoom())) &&
               never(TakenDamage()) && never(LocationID() != MessRoom) && never(GameLoaded()) && never(GameOver())
