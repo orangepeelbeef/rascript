@@ -79,5 +79,5 @@ for note in config_slot_array_notes:
     print(note)
 
 location_spawn_array_notes = generate_struct_array_notes("LocationSpawns", location_spawn_fields, array_length=94, base_address=0x1a4b30)
-for note in config_slot_array_notes:
+for note in location_spawn_array_notes:
     print(note)
