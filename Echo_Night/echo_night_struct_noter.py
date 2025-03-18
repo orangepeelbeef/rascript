@@ -1,10 +1,9 @@
-
 # Structs
 config_slot_fields = [
     {'name': "InteractionID", 'size': 4},
     {'name': "DataPTR", 'size': 4},
     {'name': "DataPTR2", 'size': 4, 'padding': 4},  # Padding!
-    {'name': "FunctionID", 'size': 4},
+    {'name': "FunctionID", 'size': 4, 'padding': 1796 },
 ]
 
 location_spawn_fields = [
@@ -101,7 +100,7 @@ location_names = [
     "a Cutscene: Train heading into tunnel",  # 0x54
     "a Cutscene: Boarding the Train",  # 0x55
     "a Cutscene: Driving to the House",  # 0x56
-    "a Cutscene: Watching the Gray Ending",  # 0x57
+    "House(Gray Ending)",  # 0x57
     "a Cutscene: Flyby The Library",  # 0x58
     "a Cutscene: Going into the Abandoned Mine",  # 0x59
     "a Cutscene: Flyby The Castle",  # 0x5a
@@ -116,6 +115,7 @@ location_names = [
 
 spawnFlags = [
     {"location": 0x00, "field_name": "Bitflags1", "bit": 0, "description": "metal handle"},
+    {"location": 0x00, "field_name": "Bitflags1", "bit": 1, "description": "metal handle being attached (temporary)"},
     {"location": 0x00, "field_name": "Bitflags1", "bit": 2, "description": "ship map"},
     {"location": 0x00, "field_name": "Bitflags1", "bit": 3, "description": "cure potion in cabinet 1"},
     {"location": 0x00, "field_name": "Bitflags1", "bit": 4, "description": "cure potion in cabinet 2"},
@@ -240,9 +240,10 @@ def find_bitflags(location_id, field_name, bitflag_list):
     return matching_bitflags
 
 
-def generate_struct_array_notes(struct_name, fields, array_length, base_address=0x0, location_names=None):
+def generate_struct_array_notes(struct_name, fields, array_length, base_address=0x0, location_names=None, reference_notes=False):
     """
-    Generates code notes for an array of structs, optionally including a list of location names.
+    Generates code notes for an array of structs, optionally including a list of location names and the ability to
+    add references to the notes from the base address.
 
     Args:
         struct_name (str): The name of the struct (e.g., "ConfigSlot").
@@ -253,6 +254,8 @@ def generate_struct_array_notes(struct_name, fields, array_length, base_address=
         location_names (list of str, optional): A list of location names, one for each element in the array.
                                                  Defaults to None (no location names). If provided, the length of
                                                  this list MUST match array_length.
+        reference_notes (bool, optional): Whether to add references to the notes from the base address.
+                                            Defaults to False.
 
     Returns:
         list: A list of strings, where each string is a code note.
@@ -267,11 +270,11 @@ def generate_struct_array_notes(struct_name, fields, array_length, base_address=
     for i in range(array_length):
         struct_base_address = base_address + (i * struct_size)
         location_name = location_names[i] if location_names else None  # Get location name for this index
-        notes.extend(generate_struct_notes(struct_name, fields, base_address=struct_base_address, array_index=i, location_name=location_name))  # Pass location_name
+        notes.extend(generate_struct_notes(struct_name, fields, base_address=struct_base_address, array_index=i, location_name=location_name, array_base_address=base_address if reference_notes else None))  # Pass location_name
     return notes
 
 
-def generate_struct_notes(struct_name, fields, base_address=0x0, array_index=None, location_name=None):
+def generate_struct_notes(struct_name, fields, base_address=0x0, array_index=None, location_name=None, array_base_address=None):
     """
     Generates code notes for a single struct (helper function).
     """
@@ -296,6 +299,10 @@ def generate_struct_notes(struct_name, fields, base_address=0x0, array_index=Non
 
         #This is where the magic happens, it appends the location information and bitflag information
         current_note = f"N0:0x{base_address + offset:x}:\"[{field_size * 8}-bit] {full_field_name}{location_string}"
+
+        # If it's not the first element in the array, add a reference note
+        if array_base_address is not None and array_index != 0:
+            current_note += f"\\r\\nSee 0x{array_base_address + offset:x} note for details"
 
         #Find relevant
         relevant_bitflags = find_bitflags(array_index, field_name, spawnFlags)
@@ -329,11 +336,11 @@ def calculate_struct_size(fields):
 
 
 # Generate notes for an array of 10 ConfigSlot structs
-config_slot_array_notes = generate_struct_array_notes("ConfigSlot", config_slot_fields, array_length=10, base_address=0x1d8d10)
+config_slot_array_notes = generate_struct_array_notes("ConfigSlot", config_slot_fields, array_length=10, base_address=0x1d8d10, reference_notes=True)
 for note in config_slot_array_notes:
     print(note)
 
 # Generate notes for array of 94 location spawns
-location_spawn_notes = generate_struct_array_notes("LocationSpawnArray", location_spawn_fields, array_length=94, base_address=0x1a4b30, location_names=location_names)
+location_spawn_notes = generate_struct_array_notes("LocationSpawns", location_spawn_fields, array_length=94, base_address=0x1a4a68, location_names=location_names)
 for note in location_spawn_notes:
     print(note)
