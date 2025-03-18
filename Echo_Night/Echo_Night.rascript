@@ -166,7 +166,7 @@ function gameState() => dword(0x09F8F8)
 
 
 
-function locationid() => dword(0x09F908)
+function LocationID() => dword(0x09F908)
 
 LocationLookup = {
     0x00: "Exploring Upr Deck - Pilothouse",
@@ -256,7 +256,7 @@ LocationLookup = {
     0x54: "📽️: Train heading into tunnel",
     0x55: "📽️: Boarding the train at East Anchor Station",
     0x56: "📽️: Escorted to the House",
-    0x57: "📽️: Watching the Good Ending",
+    0x57: "📽️: Watching the Gray Ending",
     0x58: "📽️: Flyby of The Library",
     0x59: "📽️: Going into the Abandoned Mine",
     0x5a: "📽️: Flyby of The Laboratory",
@@ -427,7 +427,7 @@ LocationSpawnflagsAddr = 0x1A4A68
 
 function locationSpawnflags(location, index) => LocationSpawnflagsAddr + index + (location * 2)
 // index should be either 0 or 1 as this is a 16-bit area
-function currentLocationSpawnflags(index) => locationSpawnflags(locationid(), index)
+function currentLocationSpawnflags(index) => locationSpawnflags(LocationID(), index)
 
 // $1A4A68: [16-bit] LocationSpawnArray[00] upr deck pilothouse spawns
 //          
@@ -943,7 +943,7 @@ PeopleMetAddr = 0x1BCBC8
 
 LocationBitflagsAddr = 0x1BCE58
 function locationBitflags(location, index) => LocationBitflagsAddr + index + (location * 0x20)
-function currentLocationBitflags(index) => locationBitflags(locationid(), index)
+function currentLocationBitflags(index) => locationBitflags(LocationID(), index)
 
 //Semantic names for later use related to locationbitflags
 function ClockWound()                => bit3(locationBitflags(House,0))
@@ -1176,9 +1176,9 @@ function itemNotePage() => byte(0x1DD704)
 
 function EnteredRoom(location, via) {
     if via != 0 {
-        return once(locationid() == location && prev(locationid() == via))
+        return once(LocationID() == location && prev(locationid() == via))
     } else {
-        return once(locationid() == location && prev(locationid() != location))
+        return once(LocationID() == location && prev(locationid() != location))
     }
 }
 
@@ -1218,30 +1218,30 @@ function AchievementFunction(cheev) {
     if cheev["kind"] == "generic" {
       achievement(
         title = cheev["title"], description = cheev["description"], points = cheev["points"], type=cheev["type"], id=id_or_zero(cheev),
-        trigger = GameRunning() && locationid() == cheev["location"] && cheev["completionbit"] > prev(cheev["completionbit"])
+        trigger = GameRunning() && LocationID() == cheev["location"] && cheev["completionbit"] > prev(cheev["completionbit"])
       )
     } else if cheev["kind"] == "genericrev" {
       achievement(
         title = cheev["title"], description = cheev["description"], points = cheev["points"], type=cheev["type"], id=id_or_zero(cheev),
-        trigger = GameRunning() && locationid() == cheev["location"] && cheev["completionbit"] < prev(cheev["completionbit"])
+        trigger = GameRunning() && LocationID() == cheev["location"] && cheev["completionbit"] < prev(cheev["completionbit"])
       )
       
     } else if cheev["kind"] == "genericpuzzle" {
       achievement(
         title = cheev["title"], description = cheev["description"], points = cheev["points"], type=cheev["type"], id=id_or_zero(cheev),
-        trigger =  playerPuzzleStatus() == 0 && playerstanding() == 1 && locationid() == cheev["location"] &&
+        trigger =  playerPuzzleStatus() == 0 && playerstanding() == 1 && LocationID() == cheev["location"] &&
         cheev["completionbit"] > prev(cheev["completionbit"])
       )
     } else if cheev["kind"] == "extraconditions" {
        achievement(
         title = cheev["title"], description = cheev["description"], points = cheev["points"], type=cheev["type"], id=id_or_zero(cheev),
-        trigger = GameRunning() && locationid() == cheev["location"] && cheev["conditions"] 
+        trigger = GameRunning() && LocationID() == cheev["location"] && cheev["conditions"] 
         && cheev["completionbit"] > prev(cheev["completionbit"])
       )
     } else if cheev["kind"] == "extraconditionstrigger" {
        achievement(
         title = cheev["title"], description = cheev["description"], points = cheev["points"], type=cheev["type"], id=id_or_zero(cheev),
-        trigger = GameRunning() && locationid() == cheev["location"] && cheev["conditions"] 
+        trigger = GameRunning() && LocationID() == cheev["location"] && cheev["conditions"] 
         && trigger_when(cheev["completionbit"] > prev(cheev["completionbit"]))
       )
     } else {
@@ -1257,7 +1257,7 @@ Cheevos = [
     { "kind": "generic", "title": "Lightbulb Moment", "description": "Always pay attention to your surroundings and turn on the basement light", "location": Basement, "completionbit":  BasementLightSwitchOn, "points": Trivial, "type": "missable"},
     
     { "kind": "extraconditionstrigger", "title": "Life Imitates Art", "description": "View the clue then solve the basement puzzle", "location": Basement, "completionbit":  BasementPuzzleSolved(), "points": Minor, "type": "missable",
-      "conditions": never(locationid() != Basement) && once(currentFunctionID() == ReadingTooltip  && currentInteractionID() == Painting && currentDataPTR() == PaintingClue)
+      "conditions": never(LocationID() != Basement) && once(currentFunctionID() == ReadingTooltip  && currentInteractionID() == Painting && currentDataPTR() == PaintingClue)
     },
     
     { "kind": "generic", "title": "A G..G..G..Ghost!", "description": "Meet a ghostly girl and mysteriously get rescued", "location": UprDeckPassageway, "completionbit": EncounteredClaudia(), "points": Trivial, "type": "progression", "id": 489270},    
@@ -1273,7 +1273,7 @@ Cheevos = [
     //
     { "kind": "generic", "title": "An Astral Exchange", "description": "Give an astral piece to the medium", "location": ObservatoryB, "completionbit": AstralPieceExchanged(), "points": Minor, "type": "missable", "id": 490706 },
     { "kind": "extraconditions", "title": "Equipped for Exchange", "description": "Give an astral piece to the medium on your first visit", "location": ObservatoryB, "completionbit": AstralPieceExchanged(), "points": MinorChallenge, "type": "missable",
-        "conditions": never(locationid() != ObservatoryB) && once(VisitedMedium() > prev(VisitedMedium())), "id": 502220
+        "conditions": never(LocationID() != ObservatoryB) && once(VisitedMedium() > prev(VisitedMedium())), "id": 502220
     },        
     // give robb the proper drink mix
     { "kind": "generic", "title": "Dead Men Don't Drink", "description": "Help Robb Derick remember and find peace", "location": GuestHallway, "completionbit": IsSpawnedRobbAstral(), "points": MediumPuzzle, "type": "progression"},
@@ -1301,7 +1301,7 @@ Cheevos = [
     // reminder to save here as there is an upcoming challenge
     { "kind": "generic", "title": "Tea Time", "description": "Unlock the kitchen door, head into the kitchen, and save now", "location": GrandDining, "completionbit": KitchenDoorUnlocked(), "points": Minor, "type": "progression"},
     //
-    { "kind": "generic", "title": "A Placating Pendant", "description": "Free the spirit of the ghost lady", "location": TerraceLazarette, "completionbit": LadySpiritFreed(), "points": Minor, "type": "progression"},
+    { "kind": "generic", "title": "A Placating Pendant", "description": "Find the pendant and help Eleanor Galleywood find peace", "location": TerraceLazarette, "completionbit": LadySpiritFreed(), "points": Minor, "type": "progression"},
     // set off the alarm and get the document off the bed
     { "kind": "genericrev", "title": "An Alarming Situation", "description": "Get the probationers document", "location": CrewsQuartersB, "completionbit": IsSpawnedSailorsDocument(), "points": EasyPuzzle, "type": "progression"},
     // doors 1 and 2 open freely, the rest only open if the math adds up
@@ -1464,7 +1464,7 @@ achievement(
     title = "A Thorough Investigation", points = EasyChallenge, type="missable",
     description = "Investigate everything in the house before leaving the area",
     id = 461607,
-    trigger = (GameRunning() && never(locationid() != House)) &&  SteamLocomotiveComplete() == 0 &&
+    trigger = (GameRunning() && never(LocationID() != House)) &&  SteamLocomotiveComplete() == 0 &&
               once(ConfigSlotInteractionID(0) == HousePolicemanIntro) &&
               (trigger_when(measured(tally(15, 
                     once(ConfigSlotInteractionID(0) == HousePoliceman        && ConfigSlotFunctionID(0) == None),
@@ -1501,7 +1501,7 @@ slotsToCheck = 5
 achievement(
     title = "Life Imitates Art", points = Minor, type="missable",
     description = "View the clue then solve the puzzle",
-    trigger = GameRunning() && never(locationid() != Basement) &&
+    trigger = GameRunning() && never(LocationID() != Basement) &&
                 once(currentFunctionID() == ReadingTooltip  && currentInteractionID() == Painting && currentDataPTR() == PaintingClue) &&
                 trigger_when(BasementPuzzleSolved() > prev(BasementPuzzleSolved()))
 )
@@ -1518,13 +1518,13 @@ achievement(
     title = "Breadcrumbs to Illumination", points = MinorChallenge, type="missable",
     description = "In one session without saving or loading, hear the clue then turn on the secret lightswitch",
     id = 491963,
-    trigger = (GameContinuedState() > 0 && locationid() == prev(locationid()) && currentConfigSlotAddr() == prev(currentConfigSlotAddr()) && once(SecretLightswitchOn() == 0) &&
+    trigger = (GameContinuedState() > 0 && LocationID() == prev(locationid()) && currentConfigSlotAddr() == prev(currentConfigSlotAddr()) && once(SecretLightswitchOn() == 0) &&
               never(GameLoaded()) && never(GameSaved())) &&
               (  
-                once(locationid() == Casino && currentFunctionID() == Dialogue  && currentInteractionID() == CasinoBoss && currentDataPTR() == LightSwitchClue1) &&
-                once(locationid() == Casino && currentFunctionID() == Dialogue  && currentInteractionID() == CasinoBoss && currentDataPTR() == LightSwitchClue2) &&
-                once(locationid() == Casino && currentFunctionID() == None      && currentInteractionID() == CasinoBoss && currentDataPTR() == LightSwitchClue3) &&
-                trigger_when(locationid() == TheaterHallway && SecretLightswitchOn() > prev(SecretLightswitchOn()))
+                once(LocationID() == Casino && currentFunctionID() == Dialogue  && currentInteractionID() == CasinoBoss && currentDataPTR() == LightSwitchClue1) &&
+                once(LocationID() == Casino && currentFunctionID() == Dialogue  && currentInteractionID() == CasinoBoss && currentDataPTR() == LightSwitchClue2) &&
+                once(LocationID() == Casino && currentFunctionID() == None      && currentInteractionID() == CasinoBoss && currentDataPTR() == LightSwitchClue3) &&
+                trigger_when(LocationID() == TheaterHallway && SecretLightswitchOn() > prev(SecretLightswitchOn()))
               ) 
 )
 
@@ -1539,7 +1539,7 @@ SignTooltip = 0x8018f9ec
 achievement(
     title = "Pow.r th. Po.l P.mp", points = MediumPuzzle, type="missable",
     description = "View the instruction tooltip and start the pool pump",
-    trigger = GameRunning() && never(locationid() != TerraceLazarette) && once(PoolPumpStarted() == 0) &&
+    trigger = GameRunning() && never(LocationID() != TerraceLazarette) && once(PoolPumpStarted() == 0) &&
                 any_of(range(0,slotsToCheck-1), (id) => 
                   (once(ConfigSlotFunctionID(id) == ReadingTooltip && ConfigSlotInteractionID(id) == BlurrySign && ConfigSlotDataPTR(id) == SignTooltip) &&
                    trigger_when(PoolPumpStarted() > prev(PoolPumpStarted()))
@@ -1551,7 +1551,7 @@ achievement(
 achievement(
     title = "Geared Up", points = MinorEvent, type ="missable", id = 505898,
     description = "Have the gear on you the first time you enter Terrace Lazarrette",
-    trigger = GameRunning() && locationid() == TerraceLazarette && IsGearInCrow() != 1 && locationMapBit(TerraceLazarette) > prev(locationMapBit(TerraceLazarette))
+    trigger = GameRunning() && LocationID() == TerraceLazarette && IsGearInCrow() != 1 && locationMapBit(TerraceLazarette) > prev(locationMapBit(TerraceLazarette))
 )
 
 
@@ -1561,9 +1561,9 @@ achievement(
     title = "O.S.H.A. Approved", points = EasyChallenge,
     description = "Fix the fusebox without getting zapped", type="missable",
     id = 490703,
-    trigger = (GameRunning() && never(locationid() != UprDeckPassagewayInside) &&
+    trigger = (GameRunning() && never(LocationID() != UprDeckPassagewayInside) &&
                once(FuseBoxWired() == 0) && once(FuseBoxWired() > prev(FuseBoxWired())) &&
-               disable_when(locationid() == UprDeckPassagewayInside && playerPuzzleStatus() == 0 && playerstanding() == 1 && playerCondition() < prev(playerCondition()), until=GameLoaded())
+               disable_when(LocationID() == UprDeckPassagewayInside && playerPuzzleStatus() == 0 && playerstanding() == 1 && playerCondition() < prev(playerCondition()), until=GameLoaded())
     )
 )
 
@@ -1581,8 +1581,8 @@ achievement(
     title = "Grabbed With Gusto", points = EasyChallenge, type="missable",
     description = "Retrieve the wire cutters and exit the room without being hit by the ghost",
     id = 489271,
-    trigger = disable_when(locationid() == UprDeckCompartment && TakenDamage(), until=GameLoaded()) && 
-              GameRunning() && never(locationid() != 4) && once(IsSpawnedWireCutter() == 1) &&
+    trigger = disable_when(LocationID() == UprDeckCompartment && TakenDamage(), until=GameLoaded()) && 
+              GameRunning() && never(LocationID() != 4) && once(IsSpawnedWireCutter() == 1) &&
               trigger_when(
                 once(IsSpawnedWireCutter() < prev(IsSpawnedWireCutter())) &&
                 (ConfigSlotInteractionID(0) == ExitDoor || ConfigSlotInteractionID(1) == ExitDoor || ConfigSlotInteractionID(2) == ExitDoor)
@@ -1592,7 +1592,7 @@ achievement(
 achievement(
     title = "When You Wish Upon a Star", points = MinorEvent, type="progression",
     description = "Visit the medium and receive the broken stone",
-    trigger = GameRunning() && never(locationid() != ObservatoryB) &&
+    trigger = GameRunning() && never(LocationID() != ObservatoryB) &&
               once(VisitedMedium() > prev(VisitedMedium())) &&
               ReceivedBrokenStone() > prev(ReceivedBrokenStone())
 )
@@ -1703,7 +1703,7 @@ achievement(
 achievement(
     title = "It's Not Easy Being Green, Medium", points = MediumChallenge, type="missable", id=505857,
     description = "Get possessed in the dining room hallway, visit the lounge, and then make your way to the medium through the pilothouse portal, without losing possession status",
-    trigger = GameRunning() && once(locationid() == DiningHallway && possessed() >0 && prev(possessed() == 0))
+    trigger = GameRunning() && once(LocationID() == DiningHallway && possessed() >0 && prev(possessed() == 0))
     && (trigger_when(measured(tally(3,
            EnteredRoom(Lounge,0),
            EnteredRoom(Pilothouse,0),
@@ -1867,7 +1867,7 @@ function ClaudiaPostconditions() {
 
 function KingPreconditions() {
     return KingTooEarlyPause() &&
-         InteractionAchievementPreconditions() && never(TakenDamage()) && never(locationid() != PrivateQuarters) &&
+         InteractionAchievementPreconditions() && never(TakenDamage()) && never(LocationID() != PrivateQuarters) &&
          pauseLockCondition()
 }
 
@@ -1880,7 +1880,7 @@ function GhostCondition(cheev,repeatvalue,type) {
     if type == "king" {
         return once(currentInteractionIDByte() == cheev["id"] && repeated(repeatvalue, totalTime() > prev(totalTime())))
     } else if type == "claudia" {
-        return once(locationid() == cheev["location"] && currentInteractionIDByte() == cheev["id"] && currentDataValue2() == cheev["dptr"] && repeated(repeatvalue, totalTime() > prev(totalTime())))
+        return once(LocationID() == cheev["location"] && currentInteractionIDByte() == cheev["id"] && currentDataValue2() == cheev["dptr"] && repeated(repeatvalue, totalTime() > prev(totalTime())))
     } else {
         assert(false,message="Unable to locate proper type for GhostCondition")
     }
@@ -1910,7 +1910,7 @@ function AchievementInteractionFunction(cheev,conditiontype) {
                   measured(tally_of(
                            cheev["list"], length(cheev["list"]),
                            (o) => once(
-                                  locationid() == o["location"] && currentInteractionID() == o["id"] && currentFunctionID() == o["fid"] && 
+                                  LocationID() == o["location"] && currentInteractionID() == o["id"] && currentFunctionID() == o["fid"] && 
                                   currentDataPTR() == o["dptr"] && prev(currentDataPTR() != o["dptr"])
                                   )
                   )) && cheev["postconditions"]
@@ -1923,7 +1923,7 @@ function AchievementInteractionFunction(cheev,conditiontype) {
                   (measured(tally_of(
                            cheev["list"], length(cheev["list"]),
                            (o) => once(
-                                  locationid() == o["location"] && currentInteractionID() == o["id"] && currentFunctionID() == o["fid"] && 
+                                  LocationID() == o["location"] && currentInteractionID() == o["id"] && currentFunctionID() == o["fid"] && 
                                   currentDataPTR() == o["dptr"] && prev(currentDataPTR() != o["dptr"])
                                   )
                   )))
@@ -1936,7 +1936,7 @@ function AchievementInteractionFunction(cheev,conditiontype) {
                   (measured(tally_of(
                            cheev["list"], length(cheev["list"]),
                            (o) => once(
-                                  locationid() == o["location"] && currentInteractionID() == o["id"] && currentFunctionID() == o["fid"] && 
+                                  LocationID() == o["location"] && currentInteractionID() == o["id"] && currentFunctionID() == o["fid"] && 
                                   currentDataPTR() == o["dptr"] && prev(currentDataPTR() != o["dptr"])
                                   )
                   )) && cheev["postconditions"])
@@ -1948,7 +1948,7 @@ function AchievementInteractionFunction(cheev,conditiontype) {
                   (measured(tally_of(
                            cheev["list"], length(cheev["list"]),
                            (o) => once(
-                                  locationid() == o["location"] && currentInteractionID() == o["id"] && currentFunctionID() == o["fid"] && 
+                                  LocationID() == o["location"] && currentInteractionID() == o["id"] && currentFunctionID() == o["fid"] && 
                                   currentDataPTR() == o["dptr"] && prev(currentDataPTR() != o["dptr"])
                                   )
                   ))) 
@@ -2008,14 +2008,14 @@ function AchievementInteractionMgr(cheev) {
 
 
 InteractionCheevos = [
-{"title": "Art Aficianado", "points": MediumChallenge, "description": "In one session, inspect every piece of framed art on the Orpheus", "list": Artwork, "type": "missable", "id": 503715},
+{"title": "Art Aficionado", "points": MediumChallenge, "description": "In one session, inspect every piece of framed art on the Orpheus", "list": Artwork, "type": "missable", "id": 503715},
 {"title": "A Grave Opening", "points": EasyChallenge, "description": "Look at the clues and then open the crypt", "list": GraveClues, "type": "missable", "id": 497931,
-   "postconditions": SolvedCryptPuzzle() > prev(SolvedCryptPuzzle()) && never(locationid() != CemeteryGraveyard) },
+   "postconditions": SolvedCryptPuzzle() > prev(SolvedCryptPuzzle()) && never(LocationID() != CemeteryGraveyard) },
 {"title": "Is Anything Else Open?", "points": Minor, "description": "Overstay your welcome and get kicked out of the casino", "list": CasinoKickOut, "type": "missable", "id": 499034},
 {"title": "Clued Cup", "points": EasyPuzzle, "description": "Discover the clues and then pick up the cup", "list": CupClues, "type": "missable", "id": 505897,
-   "postconditions": trigger_when(once(locationid() == GuestHallway && IsSpawnedCup() < prev(IsSpawnedCup()))), "preconditions": once(IsSpawnedCup() == 1)},
+   "postconditions": trigger_when(once(LocationID() == GuestHallway && IsSpawnedCup() < prev(IsSpawnedCup()))), "preconditions": once(IsSpawnedCup() == 1)},
 {"title": "Clues Clocked", "points": EasyPuzzle, "description": "Discover the clues and then pick up the clock key", "list": PQClock, "type": "missable", "id": 505899,
-   "postconditions": trigger_when(once(locationid() == WaterRoom && IsSpawnedClockKey() < prev(IsSpawnedClockKey()))), "preconditions": once(IsSpawnedClockKey() == 1)},   
+   "postconditions": trigger_when(once(LocationID() == WaterRoom && IsSpawnedClockKey() < prev(IsSpawnedClockKey()))), "preconditions": once(IsSpawnedClockKey() == 1)},   
 ]
 
 for c in InteractionCheevos {
@@ -2039,7 +2039,7 @@ achievement(
                 Medals, length(Medals), 
                    (m) => once(ScreenOpen() == 1 && itemIsBeingInteractedWith() == 1 && byte(inventorySlotHighlighted() * 8 + PlayerInventoryArrayStartAddr) == m)
                 )
-              ) && FlagPuzzleSolved() > prev(FlagPuzzleSolved()) && never(locationid() != ReadingRoom)
+              ) && FlagPuzzleSolved() > prev(FlagPuzzleSolved()) && never(LocationID() != ReadingRoom)
 )
 
 
@@ -2052,10 +2052,10 @@ achievement(
     title = "Between a King and a Hard Place", points = EasyChallenge,
     description = "Escape the mess room without being hit by the king",
     trigger = GameRunning() &&
-              once(locationid() == MessRoom && prev(locationid() == DiningRoomGalley)) &&
+              once(LocationID() == MessRoom && prev(locationid() == DiningRoomGalley)) &&
               once(currentInteractionID() == King) &&
               trigger_when(TalkedToFatherMessRoom() > prev(TalkedToFatherMessRoom())) &&
-              never(TakenDamage()) && never(locationid() != MessRoom) && never(GameLoaded()) && never(GameOver())
+              never(TakenDamage()) && never(LocationID() != MessRoom) && never(GameLoaded()) && never(GameOver())
 )
 
 
@@ -2070,10 +2070,10 @@ achievement(
     title = "Dodged a Dead End", points = HardChallenge, type = "missable",
     description = "With walking speed setting set to slower, retrieve the fish plate and escape the cemetery without being damaged",
     trigger = GameRunning() &&
-              once(locationid() == CemeteryCryptB  && CryptGateOpen() > prev(CryptGateOpen())) &&
+              once(LocationID() == CemeteryCryptB  && CryptGateOpen() > prev(CryptGateOpen())) &&
               trigger_when(FlyingFishPlateInLastSlot() == 0 && EscapedCemetery() > prev(EscapedCemetery())) &&
-              never(TakenDamage()) && never(locationid() == TerraceLazarette) && never(WalkingSpeed != Slowest) &&
-              never(locationid() == Basement) && never(GameLoaded())             
+              never(TakenDamage()) && never(LocationID() == TerraceLazarette) && never(WalkingSpeed != Slowest) &&
+              never(LocationID() == Basement) && never(GameLoaded())             
 )
 
 
@@ -2087,9 +2087,9 @@ SlotWin         = 0x200
 SlotJackpot     = 0x20a
 
 achievement(
-    title = "Slot Success", points = EasyChallenge,
+    title = "Slot Success", points = EasyChallenge, type="missable",
     description = "Win at slots",
-    trigger = GameRunning() && locationid() == Casino && CodeFlow() == PlayingSlots &&
+    trigger = GameRunning() && LocationID() == Casino && CodeFlow() == PlayingSlots &&
               ((word(ptrToSlotPayout()) == SlotWin) || (word(ptrToSlotPayout()) == SlotJackpot))
 )
 
@@ -2108,10 +2108,10 @@ RoulettePayout      = 0x202
 // This prevents a user from just betting for example 9 odd, 9 even and technically winning even though you win 0 actual chips
 
 achievement(
-    title = "Wheel of Fortune", points = MinorChallenge,
+    title = "Wheel of Fortune", points = MinorChallenge, type="missable",
     description = "Win at least 3 more chips than you bet while playing a single round of roulette",
     id = 492103,
-    trigger = GameRunning() && locationid() == Casino && CodeFlow() == PlayingRoulette && rouletteStatus() == RoulettePayout &&
+    trigger = GameRunning() && LocationID() == Casino && CodeFlow() == PlayingRoulette && rouletteStatus() == RoulettePayout &&
               prev(rouletteStatus()) == RouletteInnerSpin && (word(tbyte(0x09FA2C) + 0x000048) - rouletteChipsBet()) > 2
 )
 
@@ -2136,7 +2136,7 @@ achievement(
     title = "This Theater Has Terrible Service", points = Trivial, type="missable",
     description = "Attempt to see a film",
     id = 486665, 
-    trigger = GameRunning() && never(locationid() != Theater) && filmEngineerGone() == 0 && 
+    trigger = GameRunning() && never(LocationID() != Theater) && filmEngineerGone() == 0 && 
               // the first time you enter the theater the "In theater entrance" bit is not set for some reason
               // so this ornext covers both cases where you are in the front room
               __ornext(playerInTheaterEntrance() == 1 || (playerInTheater() == 0 && playerInTheaterBackRoom() == 0  && playerInFilmBooth() == 0)) &&
@@ -2175,8 +2175,8 @@ HORSES = [
 
 achievement(
     title = "Shine On You Crazy Diamond", points = Trivial, type = "missable",
-    description = "Ride the carousel before locating the missing item.",
-    trigger = GameRunning() && locationid() == AmusementParkCarousel && IsSpawnedAmusementParkEngagementRing() == 1 &&
+    description = "Ride the carousel before locating the missing item",
+    trigger = GameRunning() && LocationID() == AmusementParkCarousel && IsSpawnedAmusementParkEngagementRing() == 1 &&
               currentConfigSlotAddr() == prev(currentConfigSlotAddr()) &&
               any_of(HORSES, (h) => currentInteractionID() == h && prev(currentInteractionID() != h))
 )
@@ -2191,7 +2191,7 @@ Loading = 1
 achievement(
     title = "Play That Funky Music", points = EasyPuzzle, type = "missable",
     description = "Unlock the jukebox and listen to a few songs",
-    trigger = GameRunning() && JukeBoxUnlocked() == 1 && measured(tally(5, once(JukeboxStatus() == Playing && prev(JukeboxStatus() == Loading)))) && never(locationid() != Casino)
+    trigger = GameRunning() && JukeBoxUnlocked() == 1 && measured(tally(5, once(JukeboxStatus() == Playing && prev(JukeboxStatus() == Loading)))) && never(LocationID() != Casino)
 )
 
 
@@ -2259,7 +2259,7 @@ achievement(
     title = "Conclusion: A Dank Destination", points = 0,
     description = "Fail to survive the night and become a permanent fixture of the nightmare",
     id = 473928,  
-    trigger = GameRunning() && locationid() == Basement && gameOver() == 1 && prev(gameOver()) == 0
+    trigger = GameRunning() && LocationID() == Basement && gameOver() == 1 && prev(gameOver()) == 0
 )
 
 // similar to the game over scene, there is a unique ending for failing to escape, also 0 points
@@ -2275,7 +2275,7 @@ achievement(
     title = "Conclusion: A New Dawn", points = MediumChallenge, type="win_condition",
     description = "Reclaim all the astral pieces, break the cycle of insatiable ambition, and find solace in the true ending",
     id = 473925,  
-    trigger = GameRunning() && locationid() == CompartmentA && CodeFlow() == Credits && prev(CodeFlow()) == EndingTrue
+    trigger = GameRunning() && LocationID() == CompartmentA && CodeFlow() == Credits && prev(CodeFlow()) == EndingTrue
 )
 
 // evil ending
@@ -2283,7 +2283,7 @@ achievement(
     title = "Conclusion: Like Father Like Son", points = MediumChallenge, type="win_condition",
     description = "Reclaim all the astral pieces, succumb to the allure of power, and inherit the legacy of darkness",
     id = 473926,   
-    trigger = GameRunning() && locationid() == House && IsSpawnedBloodyKnife() > prev(IsSpawnedBloodyKnife())
+    trigger = GameRunning() && LocationID() == House && IsSpawnedBloodyKnife() > prev(IsSpawnedBloodyKnife())
 )
 
 // mysterious ending where the knife shows up in the trunk of the car, uhoh. 
@@ -2292,7 +2292,7 @@ achievement(
     title = "Conclusion: A Sticking Point", points = EasyChallenge, type="win_condition",
     description = "Fail to make a choice, escape the Orpheus, and discover a point of contention",
     id = 473927, 
-    trigger = GameRunning() && locationid() == GrayEndingHouse && IsSpawnedKnifeInTrunk() > prev(IsSpawnedKnifeInTrunk())
+    trigger = GameRunning() && LocationID() == GrayEndingHouse && IsSpawnedKnifeInTrunk() > prev(IsSpawnedKnifeInTrunk())
 )
 
 // rich presence
@@ -2381,7 +2381,7 @@ PuzzleLookup = {
 }
 
 rich_presence_conditional_display(playerPuzzleStatus() == 0 && playerstanding() == 1, "🧩-[ Richard is {0} 🌎:{1} 🩹:{2} 🕰️ {3} 👣:{4} ]-🧩",
-    rich_presence_lookup("Puzzle", locationid(), PuzzleLookup),
+    rich_presence_lookup("Puzzle", LocationID(), PuzzleLookup),
     rich_presence_lookup("Weather", weather(), WeatherLookup),
     rich_presence_lookup("PlayerCondition", playerCondition(), PlayerConditionLookup),
     rich_presence_value("Seconds", totalTime(), format="SECS"),
@@ -2389,7 +2389,7 @@ rich_presence_conditional_display(playerPuzzleStatus() == 0 && playerstanding() 
 )
 
 
-rich_presence_conditional_display((endGameCountdownTimer() > 0 && playerPuzzleStatus() == 1 && locationid() != 74), "🚨-[ Richard is trying to Escape the Orpheus 🕙 {0} ⏱️: {1} ]-🚨",
+rich_presence_conditional_display((endGameCountdownTimer() > 0 && playerPuzzleStatus() == 1 && LocationID() != 74), "🚨-[ Richard is trying to Escape the Orpheus 🕙 {0} ⏱️: {1} ]-🚨",
     rich_presence_value("Minutes", byte(0x1A6B30) + low4(0x1A6B31) * 90.001406271973, format="MINUTES"),
     rich_presence_value("Number", endGameCountdownTimer())
 )
@@ -2437,9 +2437,9 @@ TimeLocationLookup = {
 }
 
 
-rich_presence_conditional_display(word(locationid() * 36 + 0x082EC4) >= 10 && dword(0x09FB10) == 1 && dword(0x1A6B30) > word(0x0000FF), "🔎-[ {0} {1} 🌎:{2} 🩹:{3} 👣:{4} 🕰️ {5} 💾:{6} ]-🔎",
-    rich_presence_lookup("Location", locationid(), LocationLookup),
-    rich_presence_lookup("TimeLocation", locationid(), TimeLocationLookup),
+rich_presence_conditional_display(word(LocationID() * 36 + 0x082EC4) >= 10 && dword(0x09FB10) == 1 && dword(0x1A6B30) > word(0x0000FF), "🔎-[ {0} {1} 🌎:{2} 🩹:{3} 👣:{4} 🕰️ {5} 💾:{6} ]-🔎",
+    rich_presence_lookup("Location", LocationID(), LocationLookup),
+    rich_presence_lookup("TimeLocation", LocationID(), TimeLocationLookup),
     rich_presence_lookup("Weather", weather(), WeatherLookup),
     rich_presence_lookup("PlayerCondition", playerCondition(), PlayerConditionLookup),
     rich_presence_value("Number", pedometer()),
@@ -2448,7 +2448,7 @@ rich_presence_conditional_display(word(locationid() * 36 + 0x082EC4) >= 10 && dw
 )
 
 rich_presence_conditional_display(dword(0x09FB10) == 1 && dword(0x1A6B30) > word(0x0000FF), "🔎-[ {0} 🕙 {1} 🌎:{2} 🩹:{3} 👣:{4} 🕰️ {5} 💾:{6} ]-🔎",
-    rich_presence_lookup("Location", locationid(), LocationLookup),
+    rich_presence_lookup("Location", LocationID(), LocationLookup),
     rich_presence_value("Minutes", byte(0x1A6B30) / 2.84444 + low4(0x1A6B31) * 90.0014, format="MINUTES"),
     rich_presence_lookup("Weather", weather(), WeatherLookup),
     rich_presence_lookup("PlayerCondition", playerCondition(), PlayerConditionLookup),
@@ -2457,9 +2457,9 @@ rich_presence_conditional_display(dword(0x09FB10) == 1 && dword(0x1A6B30) > word
     rich_presence_value("Number", numSaves())
 )
 
-rich_presence_conditional_display(word(locationid() * 36 + 0x082EC4) >= 10 && dword(0x09FB10) == 1, "🔎-[ {0} {1} 🌎:{2} 🩹:{3} 👣:{4} 🕰️ {5} 💾:{6} ]-🔎",
-    rich_presence_lookup("Location", locationid(), LocationLookup),
-    rich_presence_lookup("TimeLocation", locationid(), TimeLocationLookup),
+rich_presence_conditional_display(word(LocationID() * 36 + 0x082EC4) >= 10 && dword(0x09FB10) == 1, "🔎-[ {0} {1} 🌎:{2} 🩹:{3} 👣:{4} 🕰️ {5} 💾:{6} ]-🔎",
+    rich_presence_lookup("Location", LocationID(), LocationLookup),
+    rich_presence_lookup("TimeLocation", LocationID(), TimeLocationLookup),
     rich_presence_lookup("Weather", weather(), WeatherLookup),
     rich_presence_lookup("PlayerCondition", playerCondition(), PlayerConditionLookup),
     rich_presence_value("Number", pedometer()),
@@ -2468,7 +2468,7 @@ rich_presence_conditional_display(word(locationid() * 36 + 0x082EC4) >= 10 && dw
 )
 
 rich_presence_conditional_display(dword(0x09FB10) == 1, "🔎-[ {0} 🕙 {1} 🌎:{2} 🩹:{3} 👣:{4} 🕰️ {5} 💾:{6} ]-🔎",
-    rich_presence_lookup("Location", locationid(), LocationLookup),
+    rich_presence_lookup("Location", LocationID(), LocationLookup),
     rich_presence_value("Minutes", dword(0x1A6B30) / 2.84444, format="MINUTES"),
     rich_presence_lookup("Weather", weather(), WeatherLookup),
     rich_presence_lookup("PlayerCondition", playerCondition(), PlayerConditionLookup),
@@ -2493,12 +2493,12 @@ function BlackJackGamesLost()   => byte(0x9FA21)
 
 leaderboard(
     title="Blackjack Win Streak",
-    description="Win as many consecutive hands of blackjack that you can.",
+    description="Win as many consecutive hands of blackjack that you can, submits on loss",
     id=124793,
     start=CodeFlow() == PlayingBlackjack && 
               tally(2, (BlackJackStatus() == 2 && prev(BlackJackStatus()) != 2 && BlackJackPlayerTotal() > BlackJackDealerTotal() )) &&
               never(prev(BlackJackGamesLost()) < BlackJackGamesLost()),
-    cancel=locationid() != Casino,
+    cancel=LocationID() != Casino,
     submit=__ornext((BlackJackStatus() == 2 && BlackJackGamesLost() == 1 && prev(BlackJackGamesLost()) == 0) || CodeFlow() != PlayingBlackjack),
     value=measured(tally(0, once(always_true()),
                  (BlackJackStatus() == 2 && prev(BlackJackStatus()) != 2 && BlackJackPlayerTotal() > BlackJackDealerTotal()), always_false())
@@ -2508,21 +2508,21 @@ leaderboard(
 )
 
 function grayEndingResults() {
-    return GameRunning() && locationid() == GrayEndingHouse && resultsOnScreen() && prevresultsNotOnScreen()
+    return GameRunning() && LocationID() == GrayEndingHouse && resultsOnScreen() && prevresultsNotOnScreen()
 }
 
 function evilEndingResults() {
-    return GameRunning() && locationid() == House && resultsOnScreen() && prevresultsNotOnScreen()
+    return GameRunning() && LocationID() == House && resultsOnScreen() && prevresultsNotOnScreen()
 }
 
 function trueEndingResults() {
-    return GameRunning() && locationid() == CompartmentA && resultsOnScreen() && prevresultsNotOnScreen()
+    return GameRunning() && LocationID() == CompartmentA && resultsOnScreen() && prevresultsNotOnScreen()
 }
 
 
 leaderboard(
     title="Fastest Finish - Gray Ending",
-    description="Beat the game as fast as you can. Submits on results screen.",
+    description="Beat the game as fast as you can, submits on results screen",
     start=grayEndingResults(),
     submit=grayEndingResults(),
     cancel=always_false(),
@@ -2533,7 +2533,7 @@ leaderboard(
 
 leaderboard(
     title="Fastest Finish - True Ending",
-    description="Complete the game and watch the true ending as fast as you can. Submits on results screen.",
+    description="Complete the game and watch the true ending as fast as you can, submits on results screen",
     start=trueEndingResults(),
     submit=trueEndingResults(),
     cancel=always_false(),
@@ -2544,7 +2544,7 @@ leaderboard(
 
 leaderboard(
     title="Fastest Finish - Evil Ending",
-    description="Complete the game and watch the evil ending as fast as you can. Submits on results screen.",
+    description="Complete the game and watch the evil ending as fast as you can, submits on results screen",
     start=evilEndingResults(),
     submit=evilEndingResults(),
     cancel=always_false(),
