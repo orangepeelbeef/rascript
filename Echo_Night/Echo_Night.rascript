@@ -5,10 +5,7 @@
 // set up a ptr helper function
 function ptr(addr) => dword(addr) & 0x1FFFFFFF
 
-// $09F1C2: [16-bit] config slot index
-function configSlotIndex() => word(0x09F1C2)
-
-// $09FA8c: [32-bit PTR] CurrentConfigSlotPTR
+// Config Slots
 function currentConfigSlotAddr()    => dword(0x09FA8C)
 function currentConfigSlot()        => ptr(0x09FA8c)
 function currentInteractionID()     => dword(currentConfigSlot())
@@ -19,154 +16,36 @@ function currentDataValue2()        => dword(ptr(currentConfigSlot() + 8))
 function currentFunctionID()        => dword(currentConfigSlot() + 0x10)
 
 
-// $09F7F0: [32-bit] GameContinuedState
-//          
-//          0x01=Started a New Game from the menu
-//          0x02=Continued a Game from the menu
 function GameContinuedState() => dword(0x09F7F0)
 
-
-
+// Indicates that a game was continued from save
 function GameContinued() {
    return (GameContinuedState == 2 && prev(GameContinuedState()) != 2)
 }
 
-// $09F890 [32-bit] GameResetLoop
-
-// Once the gameover screen has come up, the game starts the intro loop again but doesn't re-blank any memory
-// 0= Playing regularly no reset 
-// 2= Game over has happened
-// all other values= Black screen, reset the current location
+// After a gameover, memory is not wiped, but gameResetLoop will be > 0
 function gameResetLoop() => dword(0x09F890)
 
 function GameRunning() {
     return GameContinuedState() > 0 && saveAndLoadStatus() == 0 && prev(saveAndLoadStatus() == 0) && gameResetLoop() == 0
 }
 
-
-// $09F8D8: [32-bit] Game Over
-//          
-//          0x1=Game Over screen is up
 function gameOver() => dword(0x09F8D8)
 function GameOver() {
     return (gameOver() == 1)
 }
 
-// $09F8F0: [32-bit] End game Countdown Timer
-//          
-//          starts at 5f
-//          
-//          if this is ffffffff  bad ending?
 function endGameCountdownTimer() => dword(0x09F8F0)
+function gameState()             => dword(0x09F8F8)
+function LocationID()            => dword(0x09F908)
 
-// $09F8F8: [32-bit] Game State
-//          
-//          x00=game not ready
-//          x02=menu or in a puzzle
-//          x03=playing
-function gameState() => dword(0x09F8F8)
-
-// $09F908: [32-bit] LocationID
-//          
-//          0x00=Upr Deck - Pilothouse
-//          0x01=Upr Deck - Passageway Outside
-//          0x02=Upr Deck - Chart Room
-//          0x03=Upr Deck - Captain's Cabin
-//          0x04=Upr Deck - Compartment
-//          0x05=Floor 1 - Reading Room
-//          0x06=Floor 1 - Lounge
-//          0x07=Floor 1 - Electrical Room
-//          0x08=Floor 1 - Grand Dining Room
-//          0x09=Upr Deck - Passageway Inside
-//          0x0a=Floor 1 - Engineer Hallway
-//          0x0b=Floor 1 - Passenger Hallway
-//          0x0c=Floor 1 - Guest Hallway
-//          0x0d=Floor 1 - Dining Room Hallway
-//          0x0e=Floor 2 - Child Room
-//          0x0f=Floor 1 - Guest Room A
-//          0x10=Floor 1 - Guest Room B
-//          0x11=Floor 1 - Guest Room C
-//          0x12=Floor 1 - Guest Room D
-//          0x13=Floor 1 - Special Guest Room
-//          0x14=The Past - Pier
-//          0x15=Floor 2 - Medical Office
-//          0x16=The Past - Castle
-//          0x17=The Past - Castle Terrace
-//          0x18=The Past - Laboratory
-//          0x19=Floor 2 - Theater
-//          0x1a=Floor 2 - Mess Room
-//          0x1b=Floor 1 - Stairway
-//          0x1c=Floor 2 - Engineer's Room
-//          0x1d=Lwr Deck - Pool
-//          0x1e=Floor 1 - Dining Room Galley
-//          0x1f=Floor 2 - Casino
-//          0x20=Floor 2 - Radio Room
-//          0x21=The Past - Steam Locomotive
-//          0x22=Floor 2 - Shower Room
-//          0x23=Floor 2 - Bathroom
-//          0x24=Floor 2 - Port Corridor
-//          0x25=Floor 2 - Starboard Corridor
-//          0x26=Floor 2 - Engine Corridor
-//          0x27=Lwr Deck - Deck Terrace
-//          0x28=Floor 1 - Private Quarters
-//          0x29=The Past - Cathedral
-//          0x2a=Floor 2 - Theater Hallway
-//          0x2b=The Past - Cemetery Graveyard
-//          0x2c=Lwr Deck - Terrace Lazarette
-//          0x2d=Floor 2 - Crew's Corridor
-//          0x2e=Lwr Deck - Stern Passageway
-//          0x2f=Floor 1 - Water Room
-//          0x30=Floor 1 - Forest Room
-//          0x31=Floor 1 - Sky Room
-//          0x32=Floor 1 - Fire Room
-//          0x33=Floor 1 - Owner's Quarters
-//          0x34=Floor 2 - Crew's Quarters B
-//          0x35=Floor 2 - Crew's Quarters A
-//          0x36=The Past - Library
-//          0x37=Father's House
-//          0x38=Living Room
-//          0x39=Basement
-//          0x3a=The Past - Abandoned Mine A
-//          0x3b=The Past - Abandoned Mine B
-//          0x3c=the Past - Abandoned Mine C
-//          0x3d=The Past - Observatory A
-//          0x3e=The Past - Observatory B
-//          0x3f=The Past - Cemetery Crypt A
-//          0x40=The Past - Cemetery Crypt B
-//          0x41=Floor 3 - Engine Room B
-//          0x42=Floor 3 - Engine Room A
-//          0x43=Floor 3 - Stern Passageway
-//          0x44=Floor 3 - Boiler A
-//          0x45=Floor 3 - Boiler B
-//          0x46=Floor 3 - Fuel Storage
-//          0x47=The Past - Cathedral Basement
-//          0x48=Floor 3 - Compartment B
-//          0x49=The Past - Cathedral Stairway
-//          0x4a=Floor 3 - Compartment A
-//          0x4b=The Past - Amusement Park Fountain
-//          0x4c=The Past - Amusement Park Carousel
-//          0x4d=The Past - King's Quarters
-//          0x4e=Lwr Deck - Corridor to Pool
-//          0x4f=The Past - House
-//          0x50=The Past - Valley
-//          0x51=a Cutscene: Flyby The Orpheus
-//          0x52=a Cutscene: Flyby The House
-//          0x53=a Cutscene: Going into the Cathedral
-//          0x54=a Cutscene: Train heading into tunnel
-//          0x55=a Cutscene: Boarding the Train
-//          0x56=a Cutscene: Driving to the House
-//          0x57=a Cutscene: Watching the Good Ending
-//          0x58=a Cutscene: Flyby The Library
-//          0x59=a Cutscene: Going into the Abandoned Mine
-//          0x5a=a Cutscene: Flyby The Castle
-//          0x5b=a Cutscene: Flyby The Observatory
-//          0x5c=????
-//          0x5d=The Past - House(Outside)
-
-
-
-
-function LocationID() => dword(0x09F908)
+function EnteredRoom(location, via) {
+    if via != 0 {
+        return once(LocationID() == location && prev(LocationID() == via))
+    } else {
+        return once(LocationID() == location && prev(LocationID() != location))
+    }
+}
 
 LocationLookup = {
     0x00: "Exploring Upr Deck - Pilothouse",
@@ -352,21 +231,7 @@ EscortedToHouseCutscene = 0x56
 GrayEndingHouse         = 0x57
 PastHouseOutside        = 0x5d
 
-// $09FB10: [32-bit] Player Puzzle Status
-//          
-//          0x01=Player is Not in a Puzzle
-//          0x00=Player is in a  puzzle   (or the game hasn't been started yet, must rely on
-function playerPuzzleStatus() => dword(0x09FB10)
-
-// $09FB24: [32-bit] FileName Pointer for CD Rom Video Playing
-//          
-//          0x80086224=EDEC000.STR CZ3 Division
-//          0x80086250=EDEC001.STR Intro Trailer
-//          0x8008627c=EDEC002.STR Menu Background
-//          0x800862a8=EDEC003.STR Strange Film
-//          0x800862d4=EDEC004.STR Orpheus Rising into the Light
-//          0x80086300=EDEC005.STR Best Ending
-//          0x8008632c=EDEC006.STR Agetec Logo
+function playerPuzzleStatus()                  => dword(0x09FB10)
 function filenamePointerForCdRomVideoPlaying() => dword(0x09FB24)
 
 VideoFileLookup = {
@@ -379,314 +244,75 @@ VideoFileLookup = {
     0x8008632c: "📽️: Agetec & Fromsoft Logo",
 }
 
-// $0A0C6E: [8-bit] Astral Pieces Turned In
-//
-// number of astral pieces turned in to medium
-// 0-26
 function astralPiecesTurnedIn() => byte(0x0A0C6E)
+function casinoGameChips()      => dword(0x0A0CB0)
+function playerstanding()       => dword(0x1A3DB4)
 
 
-// $0A0CB0: [32-bit] casino game chips
-function casinoGameChips() => dword(0x0A0CB0)
-
-// $1A3DB4: [32-bit] playerStanding
-//          
-//          0x0=crouched
-//          0x1=standing
-//          
-//          manipulation of this value just resets to the value it was before
-
-function playerstanding() => dword(0x1A3DB4)
-
-// 0x1a4248
-// [800 bytes] LocationEntityStatus
-// light switches and other location flags
-
-// 200 * 4
-
-// This is an array of structs indexed by location
-// [
-//  bool, bool, bool, bool, 
-//  bool, bool, bool, bool
-// ]
-// the 4 odd indexes of the array are set true on entering the location
-
-// +0x00=pilothouse
-// +0x08=passageway   etc
-// +0x1c8=Basement
-// - - bool0=ceiling lightswitch
 LocationEntityflagsAddr = 0x1A4248
 function locationEntityflagBit(location, index) => bit0(LocationEntityflagsAddr + index + (location * 8))
 
-BasementLightSwitchOn          = locationEntityflagBit(Basement,0)
-UprDeckPassagewayInsideLightOn = locationEntityflagBit(UprDeckPassagewayInside,0)
-UprDeckCompartmentLightOn      = locationEntityflagBit(UprDeckCompartment,0)
-PilothouseLightOn              = locationEntityflagBit(Pilothouse,0)
+BasementLightSwitchOn                           = locationEntityflagBit(Basement,0)
+UprDeckPassagewayInsideLightOn                  = locationEntityflagBit(UprDeckPassagewayInside,0)
+UprDeckCompartmentLightOn                       = locationEntityflagBit(UprDeckCompartment,0)
+PilothouseLightOn                               = locationEntityflagBit(Pilothouse,0)
+visitedUprDeckPilothouse                        = locationEntityflagBit(Pilothouse,1)
 
+// index should be either 0 or 1 as this is a 2 byte area
 LocationSpawnflagsAddr = 0x1A4A68
-
-function locationSpawnflags(location, index) => LocationSpawnflagsAddr + index + (location * 2)
-// index should be either 0 or 1 as this is a 16-bit area
-function currentLocationSpawnflags(index) => locationSpawnflags(LocationID(), index)
-
-// $1A4A68: [16-bit] LocationSpawnArray[00] upr deck pilothouse spawns
-//          
-//          static config array
-//          
-//          0x32 * 4
-//          
-//          ends at 1a4b30
-//          
-//          array of 2 bytes of bitflags controlling the spawn of items in a location
-//          toggling a bit that is off back to on spawns a new copy of the item
-//          
-//          bit0=metal handle
-//          bit1=?
-//          bit2=ship map
-//          bit3=cure potion in cabinet
-//          bit4=cure potion in cabinet 2
-//          bit5=
-//          bit6=
-//          bit7=
-
-function IsSpawnedUprDeckPilothouseCurePotionInCabinet()  => bit3(locationSpawnflags(Pilothouse,0))
-function IsSpawnedUprDeckPilothouseCurePotionInCabinet2() => bit4(locationSpawnflags(Pilothouse,0))
-
-// $1A4A6A: [2bytes] LocationSpawnArray[01] upr deck passageway outside spawns
-
-// bit0=Greg Capstan (captain) astral piece
-// bit1=John Cutter astral piece
-
-function IsSpawnedJohnCutterAstral() => bit1(locationSpawnflags(UprDeckPassageway,0))
-
-// [2bytes] LocationSpawnArray[02] Chart Room spawns
-
-// bit0=Billy Bollard Astral Piece 
-// bit1=Iron Key
-
-function IsSpawnedBillyBollardAstral() => bit0(locationSpawnflags(ChartRoom,0))
-
-// $1A4A6E: [16-bit] LocationSpawnArray[03] captain's cabin spawns
-//          
-//          bit0=wire (after its cut off)
-//          bit1=cure potion in drawer
-//          bit2=leather organizer
-//          bit3=comet book
-function IsSpawnedCaptainsCabinCurePotionInDrawer() => bit1(locationSpawnflags(CaptainsCabin,0))
-
-// $1A4A70: [2bytes] LocationSpawnArray[04] upr deck compartment
-
-// bit0=wire cutters
-
-function IsSpawnedWireCutter() => bit0(locationSpawnflags(UprDeckCompartment,0))
-
-// $1A4A72: [2bytes] LocationSpawnArray[05] floor 1 reading room
-
-// bit0=Sailor Medal A is in a flag statue
-// bit1=Sailor Medal B is in a flag statue
-// bit2=Sailor Medal C is in a flag statue
-// bit3=Sailor Medal D is in a flag statue
-// bit4=Sailor Medal A (duct)
-// bit5=Brass Key
-// bit6=Ed Mooring Astral piece
-// bit7=
-function IsSpawnedEdMooringAstral() => bit6(locationSpawnflags(ReadingRoom,0))
+function locationSpawnflags(location, index)    => LocationSpawnflagsAddr + index + (location * 2)
+// unused function, preferable to use the derived static memory locations
+function currentLocationSpawnflags(index)       => locationSpawnflags(LocationID(), index)
 
 
-// $1A4A74: [16-bit] LocationSpawnArray[06] floor 1 lounge
-//          
-//          bit0=claim ticket (far left under bar)
-function IsSpawnedFloor1LoungeClaimTicketFarLeftUnderBar() => bit0(locationSpawnflags(Lounge,0))
-
-// $1A4A78: [16-bit] LocationSpawnArray[08] floor 1 grand dining
-//          
-//          bit0=fire bird plate (after talking to ghost couple)
-//          bit1=claim ticket (on table opposite the kitchen door)
-function IsSpawnedFloor1GrandDiningClaimTicketOnTableOppositeTheKitchenDoor() => bit1(locationSpawnflags(GrandDining,0))
-
-// $1a4a80 [2 bytes] LocationSpawnArray[0c] floor 1 guest hallway
-
-// bit0=cup
-// bit1=Sailor medal B
-// bit2=Robb Derick astral piece
-function IsSpawnedCup()        => bit0(locationSpawnflags(GuestHallway,0))
-function IsSpawnedRobbAstral() => bit2(locationSpawnflags(GuestHallway,0))
-
-
-// $1a4a82 [2 bytes] LocationSpawnArray[0d] dining room hallway
-//          bit1=Peter Schooner astral piece
-function IsSpawnedStewardAstral() => bit1(locationSpawnflags(DiningHallway,0))
-
-// $1A4A8A: [16-bit] LocationSpawnArray[11] guest room C spawns
-//          
-//          0| Sailor Medal C
-//          1| Cure Potion (drawer)
-//          2| Fiana Parcelling astral piece
-function IsSpawnedGuestRoomCCuringPotionInDrawer() => bit1(locationSpawnflags(GuestRoomC,0))
-function IsSpawnedFianaAstral()                    => bit2(locationSpawnflags(GuestRoomC,0))
-
-
-// $1A4A8C: [16-bit] LocationSpawnArray[12] guest room D spawns
-//          
-//          0| Sailor Medal D
-//          1| Cure Potion (drawer)
-//          2| Diana Parcelling astral piece
-function IsSpawnedGuestRoomDCuringPotionInDrawer() => bit1(locationSpawnflags(GuestRoomD,0))
-function IsSpawnedDianaAstral()                    => bit2(locationSpawnflags(GuestRoomD,0))
-
-// $1A4A8E: [16-bit] LocationSpawnArray[13] Floor 1 Special Guest Room
-//          
-//          0| Dress Suit
-//          1| Claim Ticket (bathroom floor)
-function IsSpawnedSpecialGuestRoomClaimTicketBathroomFloor() => bit1(locationSpawnflags(SpecialGuestRoom,0))
-function IsSpawnedClaudiasDoll()                             => bit2(locationSpawnflags(SpecialGuestRoom,0))
-
-// $1A4A92: [16-bit] LocationSpawnArray[15] Floor 2 Medical Office
-//          
-//          bit0=curing potion (drawer)
-//          bit1=curing potion (cabinet)
-//          bit2=antidote (locked in cabinet drawer)
-function IsSpawnedFloor2MedicalOfficeCuringPotionDrawer()  => bit0(locationSpawnflags(MedicalOffice,0))
-function IsSpawnedFloor2MedicalOfficeCuringPotionCabinet() => bit1(locationSpawnflags(MedicalOffice,0))
-
-// $1A4A98: [16-bit] LocationSpawnArray[18] Laboratory
-// bit0= prescription in drawer
-function IsSpawnedPrescription() => bit0(locationSpawnflags(Laboratory,0))
-
-// $1A4A9A: [16-bit] LocationSpawnArray[19] Floor 2 Theater
-//          
-//          bit0=Record (film booth)
-//          bit1=Scott Garboard astral piece
-//          bit2=Thomas Gusset astral piece
-//          bit3=
-//          bit4=claim ticket (on purple sofa in main theater)
-//          bit5=Cabinet Key
-function IsSpawnedFloor2TheaterClaimTicketOnSofaInMainTheater() => bit4(locationSpawnflags(Theater,0))
-function IsSpawnedThomasGussetAstral()                          => bit2(locationSpawnflags(Theater,0))
-
-// $1bd1b8
-function IsGearInCrow()                                      => bit3(locationSpawnflags(Stairway,0))
-
-// $1A4AA0: [16-bit] LocationSpawnArray[1c] Floor 2 Engineer's Room
-//          bit1=curing potion in back room chest
-
-function IsSpawnedFloor2EngineersRoomCuringPotionInBackRoomChest() => bit1(locationSpawnflags(EngineersRoom,0))
-
-// $1A4AA2: [16-bit] LocationSpawnArray[1d] Lwr Deck Pool
-//          
-//          +0x0 bitflags1
-//          - - 1| claim ticket (in locker starboard side lockerroom)
-//          - - 2| curing potion (far left locker in the port side lockerroom)
+function IsSpawnedUprDeckPilothouseCurePotionInCabinet()    => bit3(locationSpawnflags(Pilothouse,0))
+function IsSpawnedUprDeckPilothouseCurePotionInCabinet2()   => bit4(locationSpawnflags(Pilothouse,0))
+function IsSpawnedJohnCutterAstral()                        => bit1(locationSpawnflags(UprDeckPassageway,0))
+function IsSpawnedBillyBollardAstral()                      => bit0(locationSpawnflags(ChartRoom,0))
+function IsSpawnedCaptainsCabinCurePotionInDrawer()         => bit1(locationSpawnflags(CaptainsCabin,0))
+function IsSpawnedWireCutter()                              => bit0(locationSpawnflags(UprDeckCompartment,0))
+function IsSpawnedEdMooringAstral()                         => bit6(locationSpawnflags(ReadingRoom,0))
+function IsSpawnedFloor1LoungeClaimTicketFarLeftUnderBar()  => bit0(locationSpawnflags(Lounge,0))
+function IsSpawnedFloor1GrandDiningClaimTicket()            => bit1(locationSpawnflags(GrandDining,0))
+function IsSpawnedCup()                                     => bit0(locationSpawnflags(GuestHallway,0))
+function IsSpawnedRobbAstral()                              => bit2(locationSpawnflags(GuestHallway,0))
+function IsSpawnedStewardAstral()                           => bit1(locationSpawnflags(DiningHallway,0))
+function IsSpawnedGuestRoomCCuringPotionInDrawer()          => bit1(locationSpawnflags(GuestRoomC,0))
+function IsSpawnedFianaAstral()                             => bit2(locationSpawnflags(GuestRoomC,0))
+function IsSpawnedGuestRoomDCuringPotionInDrawer()          => bit1(locationSpawnflags(GuestRoomD,0))
+function IsSpawnedDianaAstral()                             => bit2(locationSpawnflags(GuestRoomD,0))
+function IsSpawnedSpecialGuestRoomClaimTicket()             => bit1(locationSpawnflags(SpecialGuestRoom,0))
+function IsSpawnedClaudiasDoll()                            => bit2(locationSpawnflags(SpecialGuestRoom,0))
+function IsSpawnedFloor2MedicalOfficeCuringPotionDrawer()   => bit0(locationSpawnflags(MedicalOffice,0))
+function IsSpawnedFloor2MedicalOfficeCuringPotionCabinet()  => bit1(locationSpawnflags(MedicalOffice,0))
+function IsSpawnedPrescription()                            => bit0(locationSpawnflags(Laboratory,0))
+function IsSpawnedFloor2TheaterClaimTicket()                => bit4(locationSpawnflags(Theater,0))
+function IsSpawnedThomasGussetAstral()                      => bit2(locationSpawnflags(Theater,0))
+function IsGearInCrow()                                     => bit3(locationSpawnflags(Stairway,0))
+function IsSpawnedFloor2EngineersRoomCuringPotion()         => bit1(locationSpawnflags(EngineersRoom,0))
 function IsSpawnedLwrDeckPoolClaimTicketInStarboardLocker() => bit1(locationSpawnflags(Pool,0))
 function IsSpawnedLwrDeckPoolRoomCuringPotionInPortLocker() => bit2(locationSpawnflags(Pool,0))
+function IsSpawnedFloor2CasinoClaimTicket()                 => bit0(locationSpawnflags(Casino,0))
+function IsSpawnedFloor2ShowerRoomCuringPotionInLocker()    => bit0(locationSpawnflags(ShowerRoom,0))
+function IsSpawnedFloor2BathroomClaimTicketInLastStall()    => bit0(locationSpawnflags(Bathroom,0))
+function IsSpawnedEmllieScuttleAstral()                     => bit0(locationSpawnflags(TerraceLazarette,0))
+function IsSpawnedFloor1WaterRoomCuringPotion()             => bit1(locationSpawnflags(WaterRoom,0))
+function IsSpawnedClockKey()                                => bit0(locationSpawnflags(WaterRoom,0))
+function PouringAntidote()                                  => bit0(locationSpawnflags(TheaterHallway,0))
+function IsSpawnedFloor1FireRoomClaimTicketOnLargeBed()     => bit1(locationSpawnflags(FireRoom,0))
+function IsSpawnedSailorsDocument()                         => bit0(locationSpawnflags(CrewsQuartersB,0))
+function IsSpawnedOscarRockwellAstral()                     => bit2(locationSpawnflags(RadioRoom,0))
+function IsSpawnedBloodyKnife()                             => bit2(locationSpawnflags(House,0))
+function IsSpawnedClaudiasDoll()                            => bit0(locationSpawnflags(AbandonedMineC,0))
+function FlyingFishPlateInLastSlot()                        => bit0(locationSpawnflags(CemeteryCryptA,0))
+function IsSpawnedBoilerACuringPotion()                     => bit1(locationSpawnflags(BoilerA,0))
+function IsSpawnedAmusementParkEngagementRing()             => bit0(locationSpawnflags(AmusementParkCarousel,0))
+function IsSpawnedKnifeInTrunk()                            => bit0(locationSpawnflags(GrayEndingHouse,0))
 
-// $1A4AA6: [2bytes] LocationSpawnArray[1f] Floor 2 Casino
-//          
-//          +0x0 bitflags1
-//          - - 0| Claim ticket (on the ground by the roulette table)
-//          - - 1| Elizabeth Crownest Blackjack Dealer Astral piece
-//          - - 2| Poly Owning Casino Manager Astral piece
-//          - - 3| Tom Rudder Roulette Dealer Astral piece
-function IsSpawnedFloor2CasinoClaimTicketFloorByRouletteTable() => bit0(locationSpawnflags(Casino,0))
-
-// $1A4AAC: [16-bit] LocationSpawnArray[22] Floor 2 - Shower Room
-//          
-//          +0x0 bitflags1
-//          - - 0| Curing potion  (middle locker)
-function IsSpawnedFloor2ShowerRoomCuringPotionInLocker() => bit0(locationSpawnflags(ShowerRoom,0))
-
-// $1A4AAE: [16-bit] LocationSpawnArray[23] Floor 2 Bathroom
-//          
-//          +0x0 bitflags
-//          - - 0| Claim ticket (last toilet stall)
-function IsSpawnedFloor2BathroomClaimTicketInLastStall() => bit0(locationSpawnflags(Bathroom,0))
-
-// $1A4AC0 [2bytes] LocationSpawnArray[2c] Lwr Deck Terrace Lazarette
-//
-//bit0=Emllie Scuttle astral piece
-//bit1=Pendant being given to ghost
-function IsSpawnedEmllieScuttleAstral() => bit0(locationSpawnflags(TerraceLazarette,0))
-
-// $1A4AC6: [16-bit] LocationSpawnArray[2f] Floor 1 Water Room
-//          
-//          bit0=clock key (on table main room)
-//          bit1=curing potion (ground in bedroom)
-function IsSpawnedFloor1WaterRoomCuringPotionGroundInBedroom() => bit1(locationSpawnflags(WaterRoom,0))
-function IsSpawnedClockKey()                                   => bit0(locationSpawnflags(WaterRoom,0))
-
-// 2a Theater Hallway
-function PouringAntidote() => bit0(locationSpawnflags(TheaterHallway,0))
-
-
-// $1A4ACC: [16-bit] LocationSpawnArray[32] Floor 1 Fire Room
-//          
-//          bit0=Jack Rockwell astral piece
-//          bit1=claim ticket (on large bed)
-function IsSpawnedFloor1FireRoomClaimTicketOnLargeBed() => bit1(locationSpawnflags(FireRoom,0))
-
-
-function IsSpawnedSailorsDocument()        => bit0(locationSpawnflags(CrewsQuartersB,0))
-
-
-function IsSpawnedOscarRockwellAstral()    => bit2(locationSpawnflags(RadioRoom,0))
-
-// [2bytes] LocationSpawnArray[37] Father's House spawns
-
-//         bit0=red book
-//         bit1=winding key
-//         bit2=Knife after killing the policeman (evil ending)
-function IsSpawnedBloodyKnife()           => bit2(locationSpawnflags(House,0))
-
-// $1A4AE0: [16-bit] LocationSpawnArray[3c] The Past Abandoned Mine C
-// bit0=Claudia's Doll
-function IsSpawnedClaudiasDoll() => bit0(locationSpawnflags(AbandonedMineC,0))
-
-function FlyingFishPlateInLastSlot() => bit0(locationSpawnflags(CemeteryCryptA,0))
-
-// $1A4AF0: [16-bit] LocationSpawnArray[44] Boiler A
-//          
-//          bit0=piston key
-//          bit1=curing potion (floor at bottom of stairs)
-function IsSpawnedBoilerACuringPotionFloorAtBottomOfStairs() => bit1(locationSpawnflags(BoilerA,0))
-
-// $1A4B00: [16-bit] LocationSpawnArray[4c] Amusement Park Carousel
-//
-//          bit0=engagement ring
-function IsSpawnedAmusementParkEngagementRing() => bit0(locationSpawnflags(AmusementParkCarousel,0))
-
-
-
-function IsSpawnedKnifeInTrunk() => bit0(locationSpawnflags(GrayEndingHouse,0))
-
-// $1A6B30: [32-bit] GameTime
-//          
-//          This value is number of seconds from the timestamp 11/17/1937 0:00
-//          
-//          [1024 bytes]
-//          The following 1024 bytes are saved and loaded from memory cards
-function gametime() => dword(0x1A6B30)
-
-// $1A6B48: [32-bit] Total Time
-//          
-//          Before the game starts it will count up slightly as the logo videos and demos play, so this is not a predictable way to detect game start
-//          
-//          Once game has started this ticks up once every second unless the game is paused.
-function totalTime() => dword(0x1A6B48)
-
-// $1A6B4C: [32-bit] Pedometer
-//          
-//          Number of steps taken in the game
-function pedometer() => dword(0x1A6B4C)
-
-// $1A6B50: [16-bit] Player Condition
-//          
-//          0x00=Dead
-//          0x01=Danger
-//          0x02=Wounded
-//          0x03=Normal
-//          0x04=Good
-//          0x05=Best
-function playerCondition() => byte(0x1A6B50)
+function gametime()          => dword(0x1A6B30)
+function totalTime()         => dword(0x1A6B48)
+function pedometer()         => dword(0x1A6B4C)
+function playerCondition()   => word(0x1A6B50)
 
 function TakenDamage() {
     return playerCondition() < prev(playerCondition())
@@ -700,15 +326,8 @@ PlayerConditionLookup = {
     0x04: "🙂",
     0x05: "😊",
 }
-function playerCondition() => word(0x1A6B50)
 
-// $1A6B55: [8-bit] Weather
-//          
-//          0x00 = Sunny
-//          0x01 = Cloudy
-//          0x02 = Raining
-//          0x03 = Snowing
-function weather() => byte(0x1A6B55)
+function weather()           => byte(0x1A6B55)
 
 WeatherLookup = {
     0x00: "☀️",
@@ -717,27 +336,15 @@ WeatherLookup = {
     0x03: "❄️",
 }
 
-// $1A6B56: [8-bit] Ship Map
-//          
-//          0x0=not obtained
-//          0x1=obtained
-function shipMap() => byte(0x1A6B56)
-
-// $1A6B57: [8-bit] Leather Organizer
-//          
-//          0x0=not obtained
-//          0x01=Obtained
-function leatherOrganizer() => byte(0x1A6B57)
-
+function shipMap()           => byte(0x1A6B56)
+function leatherOrganizer()  => byte(0x1A6B57)
 
 MapCompletionAddr = 0x1A6C78
-
 function mapCompletionArrayByte(index) => MapCompletionAddr + index
-
 function locationMapBit(location)
 {
     if location == 0 {
-        return visitedUprDeckPilothouse()
+        return visitedUprDeckPilothouse
     } else {
         MapByteOffset = (location / 8)
         MapRemainder = location & 7
@@ -746,178 +353,12 @@ function locationMapBit(location)
 }
 
 
-// $1A6C78: [bitflags] map completion array[0]
-//          
-//          0| game started/ upr deck pilothouse
-//          1| upr deck passageway outside
-//          2| upr deck chart room
-//          3| upr deck captain's cabin
-//          4| upr deck compartment
-//          5| floor 1 reading room
-//          6| floor 1 lounge
-//          7| floor 1 electrical room
-
-//function mapCompletionArray0Bitcount() => bitcount(mapCompletionArrayByte(0))
-
-//The Pilothouse map bit is set at the beginning of the game
-// so instead we check if the entities that get populated are on
-// when you walk into the area locationEntityflagBit(Pilothouse,[1,3,5,7]) get flipped on
-// turning these bits off doesn't seem to do anything, and when you come back into the room they will be on again
-// locationEntityflagBit(Pilothouse,0) is on if the lights are on in the pilothouse
-
-function visitedUprDeckPilothouse()    =>  locationEntityflagBit(Pilothouse,1)
-
-
-// $1A6C79: [bitflags] map completion array[1]
-//          
-//          0| floor 1 grand dining room
-//          1| upr deck passageway inside
-//          2| floor 1 engineer hallway
-//          3| floor 1 passenger hallway
-//          4| floor 1 guest hallway
-//          5| floor 1 dining room hallway
-//          6| floor 2 child room
-//          7| floor 1 guest room A
-//function mapCompletionArray1Bitcount() => bitcount(mapCompletionArrayByte(1))
-
-// $1A6C7A: [bitflags] map completion array[2]
-//          
-//          0| floor 1 guest room B
-//          1| floor 1 guest room C
-//          2| floor 1 guest room D
-//          3| floor 1 special guest room
-//          4| the past pier
-//          5| floor 2 medical office
-//          6| the past castle
-//          7| the past castle terrace
-//function mapCompletionArray2Bitcount() => bitcount(mapCompletionArrayByte(2))
-
-// $1A6C7B: [bitflags] map completion array[3]
-//          
-//          0| the past laboratory
-//          1| floor 2 theater
-//          2| floor 2 mess room
-//          3| floor 1 stairway
-//          4| floor 2 engineers room
-//          5| lwr deck pool
-//          6| floor 1 dining room galley
-//          7| floor 2 casino
-//function mapCompletionArray3Bitcount() => bitcount(mapCompletionArrayByte(3))
-
-// $1A6C7C: [bitflags] map completion array[4]
-//          
-//          0| floor 2 radio room
-//          1| steam locomotive
-//          2| floor 2 shower room
-//          3| floor 2 bathroom
-//          4| floor 2 port corridor
-//          5| floor 2 starboard corridor
-//          6| floor 2 engine corridor
-//          7| lwr deck - deck terrace
-//function mapCompletionArray4Bitcount() => bitcount(mapCompletionArrayByte(4))
-
-// $1A6C7D: [bitflags] map completion array[5]
-//          
-//          0| floor 1 private quarters
-//          1| the past cathedral
-//          2| floor 2 theater hallway
-//          3| the past cemetery a
-//          4| lwr deck terrace lazarette
-//          5| floor 2 crewman's quarters
-//          6| lwr deck stern passageway
-//          7| floor 1 water room
-//function mapCompletionArray5Bitcount() => bitcount(mapCompletionArrayByte(5))
-
-// $1A6C7E: [bitflags] map completion array[6]
-//          
-//          0| floor 1 forest room
-//          1| floor 1 sky room
-//          2| floor 1 fire room
-//          3| floor 1 owners quarters
-//          4| floor 2 crews quarters B
-//          5| floor 2 crews quarters A
-//          6| the past library
-//          7| father's house
-//function mapCompletionArray6Bitcount() => bitcount(mapCompletionArrayByte(6))
-
-// $1A6C7F: [bitflags] map completion array[7]
-//          
-//          0| living room
-//          1| basement
-//          2| the past abandoned mine A
-//          3| the past abandoned mine B
-//          4| the past abandoned mine C
-//          5| the past - observatory A
-//          6| the past - observatory B
-//          7| the past cemetery B
-//function mapCompletionArray7Bitcount() => bitcount(mapCompletionArrayByte(7))
-
-// $1A6C80: [bitflags] map completion array[8]
-//          
-//          0| the past cemetery C
-//          1| floor 3 engine room B
-//          2| floor 3 engine room A
-//          3| floor 3 stern passageway
-//          4| floor 3 boiler A
-//          5| floor 3 boiler B
-//          6| floor 3 fuel storage
-//          7| the past cathedral basement
-//function mapCompletionArray8Bitcount() => bitcount(mapCompletionArrayByte(8))
-
-// $1A6C81: [bitflags] map completion array[9]
-//          
-//          0| floor 3 compartment b
-//          1| the past cathedral stairway
-//          2| floor 3 compartment a  (can't get in until the game ending)
-//          3| the past amusement park fountain
-//          4| the past amusement park merry go round
-//          5| the past kings quarters
-//          6| lwr deck corridor to pool
-//          7| the past valley
-//function mapCompletionArray9Bitcount() => bitcount(mapCompletionArrayByte(9))
-
-// $1A6C8C: [32-bit] Secrets Rating part1
-//          RatingArray[0]
-//          
-//          ((this address + 01a6c9c) * 100 ) / NonZeroCount of elements starting at 80083d10
-//          
-//          Starts at 0x64
 function secretsRatingPart1() => dword(0x1A6C8C)
-
-// $1A6C90: [32-bit] Intelligence Rating
-//          RatingArray[1]
-//          
-//          Inteliigence = this value / 7 on the results screen
-//          Starts at 0x02bc
-//          Maxes at 0x0578
 function intelligenceRating() => dword(0x1A6C90)
-
-// $1A6C94: [32-bit] Physical Rating
-//          RatingArray[2]
-//          
-//          Physical = this value * 200 / NonZeroCount of elements starting at 80083d10
-//          Starts at 0x64
-function physicalRating() => dword(0x1A6C94)
-
-// $1A6C98: [32-bit] RatingArray[3]
-//          
-//          Starts at 0x64
-function ratingarray3() => dword(0x1A6C98)
-
-// $1A6C9C: [32-bit] Secrets Rating part2
-//          RatingArray[4]
-//          
-//          see 01a6c90
-//          
-//          Starts at 0x64
+function physicalRating()     => dword(0x1A6C94)
+function ratingarray3()       => dword(0x1A6C98)
 function secretsRatingPart2() => dword(0x1A6C9C)
 
-// $1A6CB4: [32-bit] Possessed
-//          
-//          any value not 0 is a counter that counts down to 0 every tick indicated possession
-//          
-//          0x0=Not Possessed
-//          0xbc=Possessed by ghost in Corridor to Pool, counts down to 0x00  (lasts 188 ticks)
 function possessed() => dword(0x1A6CB4)
 
 
@@ -990,111 +431,9 @@ function SpottedBySecretary()        => bit2(locationBitflags(Library,1))
 function JukeBoxUnlocked()           => bit2(locationBitflags(Casino,2))
 
 
-/* $1BC660  [20 bytes] Static Config CodeFlow And Position
-
-These 20 bytes are saved and loaded with your game
-
-+0x00 [32-bit] CodeFlow
-..normally this value is the same as locationoffset, but sometimes this value is different, those 
-..conditions are labeled below
-..0xc8=Roulette 
-..0xc9=Slots
-..0xca=Blackjack
-..0xcd=In the Theater
-..0xd2=Credits
-..0xd3=Good or Evil Ending
-..0xdc=Best Ending
-..0xd4=Worst Ending Richard Missing (out of time on boat)
-
-+0x4  [16-bit] NextXCoordinate
-+0x6  [16-bit] NextYCoordinate
-+0x8  [32-bit] NextZCoordinate
-+0xc  [16-bit] NextCameraVPos
-+0xe  [16-bit] NextCameraHPos
-
-*/
-
 function CodeFlow() => dword(0x1BC660)
 
-// $1BEBC8: [384bytes][Array] PlayerInventory Array (96 slots)
-//          
-//          PlayerInventory is an array of Inventory Structs of the format
-//          
-//          - [  Inventory Slot
-//          - - [8-bit] ItemID
-//          - - [8-bit] ItemIsEquipped
-//          - - [16-bit] ItemQty
-//          - ]
-//          
-//          - [8-bit] ItemIsEquipped
-//          - - 0x0=not equipped
-//          - - 0x1=equipped
-//          
-//          - [16-bit] ItemQty
-//          - - ItemQty is a short that contains the quantity of the item in this slot
-//          
-//          - [8-bit] ItemId
-//          - - 0x01=Metal Handle
-//          - - 0x02=Brass Key
-//          - - 0x03=Red Book
-//          - - 0x04=Holy Water
-//          - - 0x05=Small Key
-//          - - 0x06=Wire Cutter
-//          - - 0x07=Invitation Letter
-//          - - 0x08=Iron Key
-//          - - 0x09=Sailor Medal A
-//          - - 0x0A=Sailor Medal B
-//          - - 0x0B=Sailor Medal C
-//          - - 0x0C=Sailor Medal D
-//          - - 0x0D=Broken Stone
-//          - - 0x0E=Blue Stone Piece
-//          - - 0x0F=Winding Key
-//          - - 0x10=Glass
-//          - - 0x11=Curing Potion
-//          - - 0x12=Wire
-//          - - 0x13=Athlete’s Foot Bot (Not Implemented)
-//          - - 0x14=Rubber Gloves
-//          - - 0x15=Dress Suit
-//          - - 0x16=Astral Piece
-//          - - 0x17=Flying Fish Plate
-//          - - 0x18=Record
-//          - - 0x19=Knife
-//          - - 0x1A=Comet Book
-//          - - 0x1B=Film
-//          - - 0x1C=Crown Piece
-//          - - 0x1D=Old Book
-//          - - 0x1E=Prescription
-//          - - 0x1F=Eye of A Sea Fish
-//          - - 0x20=Gear
-//          - - 0x21=Water Leaf Plate
-//          - - 0x22=Forest Fire Plate
-//          - - 0x23=Fire Bird Plate
-//          - - 0x24=Claim Ticket
-//          - - 0x25=Kitchen Key
-//          - - 0x26=Crank
-//          - - 0x27=Sailor’s Documents
-//          - - 0x28=Engagement Ring
-//          - - 0x29=Bullet
-//          - - 0x2A=Earring
-//          - - 0x2B=Music Box
-//          - - 0x2C=Valve
-//          - - 0x2D=Piston Key
-//          - - 0x2E=Engine Room Key
-//          - - 0x2F=Old Picture
-//          - - 0x30=Blue Stone
-//          - - 0x31=Clock Key
-//          - - 0x32=Claudia’s Doll
-//          - - 0x33=Antidote
-//          - - 0x34=Cabinet Key
-//          - - 0x35=Pendant
-//          - - 0x36=Cameo
-//          
-//          - - don't normally show in inventory, but documenting the id's anyway
-//          - - 0x5e=Ship Map
-//          - - 0x5f=Leather Organizer
-
 PlayerInventoryArrayStartAddr = 0x1bebc8
-
 
 // $1D8D10 Config slot Array
 ConfigSlotAddr = 0x1D8D10
@@ -1105,82 +444,27 @@ function ConfigSlotDataPTR(index)           => dword(ConfigSlotAddr + 4 + (index
 
 
 // Function IDs
-ReadingTooltip            = 23
 None                      = 0
-Opening                   = 18
-Closing                   = 11
+Opening                   = 0x12
+Closing                   = 0xb
+ReadingText               = 0x17
 
-// $1DD6F8: [8-bit] Item Details Screen Open
-//          
-//          This is the screen that shows the items description and usually shows Use or Read options if they are available
-//          Open the select screen, choose Item, then select the item you want to view
-//          
-//          0x0=Screen Not Open
-//          0x1=Screen Open
 
-// When opening the load menu/loading a game
-// 0x1=On the load select screen --  before this bit flips 1dd6fa counts up to 4 as the memory card is checked
-// 0x2=Load this data file? prompt
-// 0x4=Loading save from memory card, waits for 1dd6fa to hit 2 before proceeding
-
-// When opening save menu/saving a game
-// 0x1=on the save select screen -- before this goes to 1 1dd6fa counts up to 4
-// 0x2=overwrite/save data?  prompt
-// 0x3=saving file   1dd6fa  counts up to 2  
-
-function ScreenOpen() => byte(0x1DD6F8)
-
-// $1DD6FA: [16-bit] SaveAndLoadStatus
-// These values are set when the game is saving or loading, its also used to display error conditions like if the memory card is corrupted etc.
-// Values are temporary, once save or load is complete the value resets to 0
-// so any game logic looking for this value to be 0 are meant as save protection
-function saveAndLoadStatus() => word(0x1DD6FA)
-
+function ScreenOpen()                 => byte(0x1DD6F8)
+function saveAndLoadStatus()          => word(0x1DD6FA)
 
 function GameLoaded() {
     return ScreenOpen() == 4 && saveAndLoadStatus() == 2
 }
-
 function GameSaved() {
     return ScreenOpen() == 3 && saveAndLoadStatus() == 2
 }
 
-
-
-// $1DD6FC: [8-bit] inventory slot highlighted
-function inventorySlotHighlighted() => byte(0x1DD6FC)
-
-// $1DD6FE: [8-bit] item is being interacted with
-//          
-//          0x01 highlighted in the item selection
-//          0x32 Read clicked
-//          0x33 Reading
+function inventorySlotHighlighted()  => byte(0x1DD6FC)
 function itemIsBeingInteractedWith() => byte(0x1DD6FE)
-
-// $1DD704: [8-bit] Item Note Page
-function itemNotePage() => byte(0x1DD704)
-
-// $1FFED0: [32-bit] PTR
-//          
-//          0x0d playing normally
-//          0x10 select screen up
-//          0x0b map loading
-//          0x40 map on screen floor1?
-//          0x80082ed4  notes screen up
-//          0x800542c0  inventory screen up
-//          0x8005445c  inventory screen up, item selected in slot > 8
-//          0x8005429c  inventory item details screen
-//function SomethingPtr() => dword(0x1FFED0)
+function itemNotePage()              => byte(0x1DD704)
 
 
-
-function EnteredRoom(location, via) {
-    if via != 0 {
-        return once(LocationID() == location && prev(LocationID() == via))
-    } else {
-        return once(LocationID() == location && prev(LocationID() != location))
-    }
-}
 
 
 
@@ -1257,7 +541,7 @@ Cheevos = [
     { "kind": "generic", "title": "Lightbulb Moment", "description": "Always pay attention to your surroundings and turn on the basement light", "location": Basement, "completionbit":  BasementLightSwitchOn, "points": Trivial, "type": "missable"},
     
     { "kind": "extraconditionstrigger", "title": "Life Imitates Art", "description": "View the clue then solve the basement puzzle", "location": Basement, "completionbit":  BasementPuzzleSolved(), "points": Minor, "type": "missable",
-      "conditions": never(LocationID() != Basement) && once(currentFunctionID() == ReadingTooltip  && currentInteractionID() == Painting && currentDataPTR() == PaintingClue)
+      "conditions": never(LocationID() != Basement) && once(currentFunctionID() == ReadingText  && currentInteractionID() == Painting && currentDataPTR() == PaintingClue)
     },
     
     { "kind": "generic", "title": "A G..G..G..Ghost!", "description": "Meet a ghostly girl and mysteriously get rescued", "location": UprDeckPassageway, "completionbit": EncounteredClaudia(), "points": Trivial, "type": "progression", "id": 489270},    
@@ -1403,7 +687,7 @@ MapArray = []
 // look at the 8 bits individually, replacing the pilothousebit with its entity bit
 for m in range(0,9) {
     if m == 0 {
-        array_push(MapArray, visitedUprDeckPilothouse())
+        array_push(MapArray, locationMapBit(Pilothouse))
         for b in range(1,7) {
             array_push(MapArray, locationMapBit(b))
         }
@@ -1436,26 +720,26 @@ achievement(
 // this must be completed prior to teleporting away or it will be missed
 
 // Items with tooltips
-HouseFireplace            = 1
-HouseBurntBookshelf1      = 2
-HouseBurntBookshelf2      = 3
-HouseLamp                 = 4
-HouseBed                  = 13
-HouseUnlockedClockCabinet = 61
-HouseWindingKey           = 201
-HouseBurntChair           = 255
-HouseGrandfatherClock     = 267
+HouseFireplace            = 0x1
+HouseBurntBookshelf1      = 0x2
+HouseBurntBookshelf2      = 0x3
+HouseLamp                 = 0x4
+HouseBed                  = 0xd
+HouseUnlockedClockCabinet = 0x3d
+HouseWindingKey           = 0xc9
+HouseBurntChair           = 0xff
+HouseGrandfatherClock     = 0x10b
 
 // when the opened clock is in slot 0, the clock hands and keyhole are in slot 3
-MinuteHand                = 3
-HourHand                  = 2
-WindingKeyhole            = 1
+MinuteHand                = 0x3
+HourHand                  = 0x2
+WindingKeyhole            = 0x1
 
 // Items without tooltips
-HouseFirstDoor            = 6
-HouseBedroomDoor          = 8
-HousePolicemanIntro       = 101
-HousePoliceman            = 110
+HouseFirstDoor            = 0x6
+HouseBedroomDoor          = 0x8
+HousePolicemanIntro       = 0x65
+HousePoliceman            = 0x6e
 HouseOpenedClock          = 0x100000B
 
 
@@ -1470,17 +754,17 @@ achievement(
                     once(ConfigSlotInteractionID(0) == HousePoliceman        && ConfigSlotFunctionID(0) == None),
                     once(ConfigSlotInteractionID(0) == HouseFirstDoor        && ConfigSlotFunctionID(0) == Opening),
                     once(ConfigSlotInteractionID(0) == HouseBedroomDoor      && ConfigSlotFunctionID(0) == Opening),                 
-                    once(ConfigSlotInteractionID(0) == HouseFireplace        && ConfigSlotFunctionID(0) == ReadingTooltip),
-                    once(ConfigSlotInteractionID(0) == HouseBurntBookshelf1  && ConfigSlotFunctionID(0) == ReadingTooltip),
-                    once(ConfigSlotInteractionID(0) == HouseBurntBookshelf2  && ConfigSlotFunctionID(0) == ReadingTooltip),
-                    once(ConfigSlotInteractionID(0) == HouseLamp             && ConfigSlotFunctionID(0) == ReadingTooltip),
-                    once(ConfigSlotInteractionID(0) == HouseBurntChair       && ConfigSlotFunctionID(0) == ReadingTooltip),
-                    once(ConfigSlotInteractionID(0) == HouseWindingKey       && ConfigSlotFunctionID(0) == ReadingTooltip),
-                    once(ConfigSlotInteractionID(0) == HouseBed              && ConfigSlotFunctionID(0) == ReadingTooltip),
-                    once(ConfigSlotInteractionID(0) == HouseGrandfatherClock && ConfigSlotFunctionID(0) == ReadingTooltip),
-                    once(currentInteractionID() == MinuteHand         && currentFunctionID() == ReadingTooltip),
-                    once(currentInteractionID() == HourHand           && currentFunctionID() == ReadingTooltip),
-                    once(currentInteractionID() == WindingKeyhole     && currentFunctionID() == ReadingTooltip),
+                    once(ConfigSlotInteractionID(0) == HouseFireplace        && ConfigSlotFunctionID(0) == ReadingText),
+                    once(ConfigSlotInteractionID(0) == HouseBurntBookshelf1  && ConfigSlotFunctionID(0) == ReadingText),
+                    once(ConfigSlotInteractionID(0) == HouseBurntBookshelf2  && ConfigSlotFunctionID(0) == ReadingText),
+                    once(ConfigSlotInteractionID(0) == HouseLamp             && ConfigSlotFunctionID(0) == ReadingText),
+                    once(ConfigSlotInteractionID(0) == HouseBurntChair       && ConfigSlotFunctionID(0) == ReadingText),
+                    once(ConfigSlotInteractionID(0) == HouseWindingKey       && ConfigSlotFunctionID(0) == ReadingText),
+                    once(ConfigSlotInteractionID(0) == HouseBed              && ConfigSlotFunctionID(0) == ReadingText),
+                    once(ConfigSlotInteractionID(0) == HouseGrandfatherClock && ConfigSlotFunctionID(0) == ReadingText),
+                    once(currentInteractionID() == MinuteHand         && currentFunctionID() == ReadingText),
+                    once(currentInteractionID() == HourHand           && currentFunctionID() == ReadingText),
+                    once(currentInteractionID() == WindingKeyhole     && currentFunctionID() == ReadingText),
                     once(ClockWound() > prev(ClockWound()))),
                     format="percent"
                 )))
@@ -1502,13 +786,13 @@ achievement(
     title = "Life Imitates Art", points = Minor, type="missable",
     description = "View the clue then solve the puzzle",
     trigger = GameRunning() && never(LocationID() != Basement) &&
-                once(currentFunctionID() == ReadingTooltip  && currentInteractionID() == Painting && currentDataPTR() == PaintingClue) &&
+                once(currentFunctionID() == ReadingText  && currentInteractionID() == Painting && currentDataPTR() == PaintingClue) &&
                 trigger_when(BasementPuzzleSolved() > prev(BasementPuzzleSolved()))
 )
 */
 
 CasinoBoss       = 0x164
-Dialogue         = 0x17
+
 // These are pointers to the start of ascii text block in their custom encoding
 LightSwitchClue1 = 0x8018f9b8
 LightSwitchClue2 = 0x8018fa8c
@@ -1521,32 +805,15 @@ achievement(
     trigger = (GameContinuedState() > 0 && LocationID() == prev(LocationID()) && currentConfigSlotAddr() == prev(currentConfigSlotAddr()) && once(SecretLightswitchOn() == 0) &&
               never(GameLoaded()) && never(GameSaved())) &&
               (  
-                once(LocationID() == Casino && currentFunctionID() == Dialogue  && currentInteractionID() == CasinoBoss && currentDataPTR() == LightSwitchClue1) &&
-                once(LocationID() == Casino && currentFunctionID() == Dialogue  && currentInteractionID() == CasinoBoss && currentDataPTR() == LightSwitchClue2) &&
-                once(LocationID() == Casino && currentFunctionID() == None      && currentInteractionID() == CasinoBoss && currentDataPTR() == LightSwitchClue3) &&
+                once(LocationID() == Casino && currentFunctionID() == ReadingText  && currentInteractionID() == CasinoBoss && currentDataPTR() == LightSwitchClue1) &&
+                once(LocationID() == Casino && currentFunctionID() == ReadingText  && currentInteractionID() == CasinoBoss && currentDataPTR() == LightSwitchClue2) &&
+                once(LocationID() == Casino && currentFunctionID() == None         && currentInteractionID() == CasinoBoss && currentDataPTR() == LightSwitchClue3) &&
                 trigger_when(LocationID() == TheaterHallway && SecretLightswitchOn() > prev(SecretLightswitchOn()))
               ) 
 )
 
 
 // collect all four plates ?
-
-BlurrySign = 0x25
-SignTooltip = 0x8018f9ec
-
-// view the clue and start the generator
-// the sign is very blurry so the cheevo title has dots to simulate missing letters
-achievement(
-    title = "Pow.r th. Po.l P.mp", points = MediumPuzzle, type="missable",
-    description = "View the instruction tooltip and start the pool pump",
-    trigger = GameRunning() && never(LocationID() != TerraceLazarette) && once(PoolPumpStarted() == 0) &&
-                any_of(range(0,slotsToCheck-1), (id) => 
-                  (once(ConfigSlotFunctionID(id) == ReadingTooltip && ConfigSlotInteractionID(id) == BlurrySign && ConfigSlotDataPTR(id) == SignTooltip) &&
-                   trigger_when(PoolPumpStarted() > prev(PoolPumpStarted()))
-                  )
-                )
-)
-
 
 achievement(
     title = "Geared Up", points = MinorEvent, type ="missable", id = 505898,
@@ -1582,7 +849,7 @@ achievement(
     description = "Retrieve the wire cutters and exit the room without being hit by the ghost",
     id = 489271,
     trigger = disable_when(LocationID() == UprDeckCompartment && TakenDamage(), until=GameLoaded()) && 
-              GameRunning() && never(LocationID() != 4) && once(IsSpawnedWireCutter() == 1) &&
+              GameRunning() && never(LocationID() != UprDeckCompartment) && once(IsSpawnedWireCutter() == 1) &&
               trigger_when(
                 once(IsSpawnedWireCutter() < prev(IsSpawnedWireCutter())) &&
                 (ConfigSlotInteractionID(0) == ExitDoor || ConfigSlotInteractionID(1) == ExitDoor || ConfigSlotInteractionID(2) == ExitDoor)
@@ -1617,11 +884,11 @@ achievement(
 
 TICKETS = [
     {"ticket": IsSpawnedFloor1LoungeClaimTicketFarLeftUnderBar(),                    "loc": Lounge},
-    {"ticket": IsSpawnedFloor1GrandDiningClaimTicketOnTableOppositeTheKitchenDoor(), "loc": GrandDining},
-    {"ticket": IsSpawnedSpecialGuestRoomClaimTicketBathroomFloor(),                  "loc": SpecialGuestRoom},
-    {"ticket": IsSpawnedFloor2TheaterClaimTicketOnSofaInMainTheater(),               "loc": Theater},
+    {"ticket": IsSpawnedFloor1GrandDiningClaimTicket(),                              "loc": GrandDining},
+    {"ticket": IsSpawnedSpecialGuestRoomClaimTicket(),                               "loc": SpecialGuestRoom},
+    {"ticket": IsSpawnedFloor2TheaterClaimTicket(),                                  "loc": Theater},
     {"ticket": IsSpawnedLwrDeckPoolClaimTicketInStarboardLocker(),                   "loc": Pool},
-    {"ticket": IsSpawnedFloor2CasinoClaimTicketFloorByRouletteTable(),               "loc": Casino},
+    {"ticket": IsSpawnedFloor2CasinoClaimTicket(),                                   "loc": Casino},
     {"ticket": IsSpawnedFloor2BathroomClaimTicketInLastStall(),                      "loc": Bathroom},
     {"ticket": IsSpawnedFloor1FireRoomClaimTicketOnLargeBed(),                       "loc": FireRoom},
 ]
@@ -1648,11 +915,11 @@ achievement(
 CURES = [
     {"cure": IsSpawnedGuestRoomDCuringPotionInDrawer(),                            "bit": locationMapBit(GuestRoomD)},
     {"cure": IsSpawnedGuestRoomCCuringPotionInDrawer(),                            "bit": locationMapBit(GuestRoomC)},
-    {"cure": IsSpawnedBoilerACuringPotionFloorAtBottomOfStairs(),                  "bit": locationMapBit(BoilerA)},
-    {"cure": IsSpawnedFloor1WaterRoomCuringPotionGroundInBedroom(),                "bit": locationMapBit(WaterRoom)},
+    {"cure": IsSpawnedBoilerACuringPotion(),                                       "bit": locationMapBit(BoilerA)},
+    {"cure": IsSpawnedFloor1WaterRoomCuringPotion(),                               "bit": locationMapBit(WaterRoom)},
     {"cure": IsSpawnedFloor2ShowerRoomCuringPotionInLocker(),                      "bit": locationMapBit(ShowerRoom)},
     {"cure": IsSpawnedLwrDeckPoolRoomCuringPotionInPortLocker(),                   "bit": locationMapBit(Pool)},
-    {"cure": IsSpawnedFloor2EngineersRoomCuringPotionInBackRoomChest(),            "bit": locationMapBit(EngineersRoom)},
+    {"cure": IsSpawnedFloor2EngineersRoomCuringPotion(),                           "bit": locationMapBit(EngineersRoom)},
     {"cure": IsSpawnedFloor2MedicalOfficeCuringPotionDrawer(),                     "bit": locationMapBit(MedicalOffice)},
     {"cure": IsSpawnedFloor2MedicalOfficeCuringPotionCabinet(),                    "bit": locationMapBit(MedicalOffice)},
     {"cure": IsSpawnedCaptainsCabinCurePotionInDrawer(),                           "bit": locationMapBit(CaptainsCabin)},
@@ -1713,7 +980,16 @@ achievement(
 )
 
 
-// desk in guest room A has the clue to check the paintings for the drunk guy
+
+CasinoBossKick      = 0xf0        // casino boss while being kicked out
+CasinoBossKickOut1  = 0x80190ea4  // "Sir..."
+CasinoBossKickOut2  = 0x80190fd4  // "I'm sorry but we are closed for the day"
+
+
+CasinoKickOut = [
+  {"location": Casino,     "id": CasinoBossKick, "fid": ReadingText, "dptr": CasinoBossKickOut1}, // "Sir..."
+  {"location": Casino,     "id": CasinoBossKick, "fid": ReadingText, "dptr": CasinoBossKickOut2}, // "I'm sorry but we are closed for the day"
+]
 
 
 // Cemetery
@@ -1743,57 +1019,51 @@ Grave3Back = 0x10e
 Grave3BackData = 0x8018eb64
 //0x10e "emblem shape of wing"
 
-
-
-
-
 GraveClues = [
-{"location": CemeteryGraveyard, "id": Grave1Front, "fid": ReadingTooltip, "dptr": Grave1FrontData}, 
-{"location": CemeteryGraveyard, "id": Grave1Back,  "fid": ReadingTooltip, "dptr": Grave1BackData},
-{"location": CemeteryGraveyard, "id": Grave2Front, "fid": ReadingTooltip, "dptr": Grave2FrontData}, 
-{"location": CemeteryGraveyard, "id": Grave2Back,  "fid": ReadingTooltip, "dptr": Grave2BackData},
-{"location": CemeteryGraveyard, "id": Grave3Front, "fid": ReadingTooltip, "dptr": Grave3FrontData}, 
-{"location": CemeteryGraveyard, "id": Grave3Back,  "fid": ReadingTooltip, "dptr": Grave3BackData},   
+{"location": CemeteryGraveyard, "id": Grave1Front, "fid": ReadingText, "dptr": Grave1FrontData}, 
+{"location": CemeteryGraveyard, "id": Grave1Back,  "fid": ReadingText, "dptr": Grave1BackData},
+{"location": CemeteryGraveyard, "id": Grave2Front, "fid": ReadingText, "dptr": Grave2FrontData}, 
+{"location": CemeteryGraveyard, "id": Grave2Back,  "fid": ReadingText, "dptr": Grave2BackData},
+{"location": CemeteryGraveyard, "id": Grave3Front, "fid": ReadingText, "dptr": Grave3FrontData}, 
+{"location": CemeteryGraveyard, "id": Grave3Back,  "fid": ReadingText, "dptr": Grave3BackData},   
 ]
-
 
 CupClues = [
-{"location": GuestRoomA, "id": 02, "fid": ReadingTooltip, "dptr": 0x8018dd74},  //i can't fulfill robb my painting
-{"location": GuestRoomA, "id": 02, "fid": ReadingTooltip, "dptr": 0x8018ddfc},  //over there to make the drink      - Ed Mooring
-{"location": Lounge,     "id": 23, "fid": ReadingTooltip, "dptr": 0x8018e734},  // E.M. Painting
+{"location": GuestRoomA, "id": 0x02, "fid": ReadingText, "dptr": 0x8018dd74},  //i can't fulfill robb my painting
+{"location": GuestRoomA, "id": 0x02, "fid": ReadingText, "dptr": 0x8018ddfc},  //over there to make the drink      - Ed Mooring
+{"location": Lounge,     "id": 0x17, "fid": ReadingText, "dptr": 0x8018e734},  // E.M. Painting
 ]
-
-
 
 PQClock = [
-{"location": ForestRoom, "id": 0x64, "fid": Dialogue, "dptr": 0x8018eef0},
-{"location": ForestRoom, "id": 0x64, "fid": Dialogue, "dptr": 0x8018ef74},
-{"location": FireRoom,   "id": 0x6e, "fid": Dialogue, "dptr": 0x8018f200},  //adjust the hallway clock to the bird
+{"location": ForestRoom, "id": 0x64, "fid": ReadingText, "dptr": 0x8018eef0},
+{"location": ForestRoom, "id": 0x64, "fid": ReadingText, "dptr": 0x8018ef74},
+{"location": FireRoom,   "id": 0x6e, "fid": ReadingText, "dptr": 0x8018f200},  //adjust the hallway clock to the bird
 ]
 
-
-
 // Find all the paintings/pictures in the game, excludes the one in the basement in the beginning since you can't get back there after you leave.
-
-
 Artwork = [
-{"location": Lounge,      "id": 22, "fid": ReadingTooltip, "dptr": 0x8018e63c}, // 3bottles painting
-{"location": Lounge,      "id": 23, "fid": ReadingTooltip, "dptr": 0x8018e734}, // E.M. Painting
-{"location": Lounge,      "id": 24, "fid": ReadingTooltip, "dptr": 0x8018e828}, // K.S. Painting
-{"location": Lounge,      "id": 14, "fid": ReadingTooltip, "dptr": 0x8018de28}, // giant snake 2 blades painting
-{"location": GuestRoomA,  "id": 26, "fid": ReadingTooltip, "dptr": 0x8018ecf4}, // E.M. Canvas
-{"location": GrandDining, "id": 17, "fid": ReadingTooltip, "dptr": 0x8018de5c}, // old castle with sun
-{"location": GrandDining, "id": 19, "fid": ReadingTooltip, "dptr": 0x8018e00c}, // strange monster
-{"location": GrandDining, "id": 18, "fid": ReadingTooltip, "dptr": 0x8018df30}, // lady with fin
-{"location": WaterRoom,   "id": 32, "fid": ReadingTooltip, "dptr": 0x8018e9d0}, // hilda rockwell
-{"location": WaterRoom,   "id": 31, "fid": ReadingTooltip, "dptr": 0x8018e944}, // arthur rockwell
-{"location": SkyRoom,     "id": 29, "fid": ReadingTooltip, "dptr": 0x8018ea2c}, // pic with baby
-{"location": SkyRoom,     "id": 28, "fid": ReadingTooltip, "dptr": 0x8018e970}, // commemorative picture
-{"location": SkyRoom,     "id": 31, "fid": ReadingTooltip, "dptr": 0x8018ec38}, // pic parents with daughter
-{"location": SkyRoom,     "id": 30, "fid": ReadingTooltip, "dptr": 0x8018eb60}, // pic dad& 4year old crea
-{"location": SkyRoom,     "id": 32, "fid": ReadingTooltip, "dptr": 0x8018ed0c}, // painting of a castle
+{"location": Lounge,      "id": 0x16, "fid": ReadingText, "dptr": 0x8018e63c}, // 3bottles painting
+{"location": Lounge,      "id": 0x17, "fid": ReadingText, "dptr": 0x8018e734}, // E.M. Painting
+{"location": Lounge,      "id": 0x18, "fid": ReadingText, "dptr": 0x8018e828}, // K.S. Painting
+{"location": Lounge,      "id": 0x0e, "fid": ReadingText, "dptr": 0x8018de28}, // giant snake 2 blades painting
+{"location": GuestRoomA,  "id": 0x1a, "fid": ReadingText, "dptr": 0x8018ecf4}, // E.M. Canvas
+{"location": GrandDining, "id": 0x11, "fid": ReadingText, "dptr": 0x8018de5c}, // old castle with sun
+{"location": GrandDining, "id": 0x13, "fid": ReadingText, "dptr": 0x8018e00c}, // strange monster
+{"location": GrandDining, "id": 0x12, "fid": ReadingText, "dptr": 0x8018df30}, // lady with fin
+{"location": WaterRoom,   "id": 0x20, "fid": ReadingText, "dptr": 0x8018e9d0}, // hilda rockwell
+{"location": WaterRoom,   "id": 0x1f, "fid": ReadingText, "dptr": 0x8018e944}, // arthur rockwell
+{"location": SkyRoom,     "id": 0x1d, "fid": ReadingText, "dptr": 0x8018ea2c}, // pic with baby
+{"location": SkyRoom,     "id": 0x1c, "fid": ReadingText, "dptr": 0x8018e970}, // commemorative picture
+{"location": SkyRoom,     "id": 0x1f, "fid": ReadingText, "dptr": 0x8018ec38}, // pic parents with daughter
+{"location": SkyRoom,     "id": 0x1e, "fid": ReadingText, "dptr": 0x8018eb60}, // pic dad& 4year old crea
+{"location": SkyRoom,     "id": 0x20, "fid": ReadingText, "dptr": 0x8018ed0c}, // painting of a castle
 ] 
 
+PoolPump = [
+{"location": TerraceLazarette, "id": 0x25, "fid": ReadingText, "dptr": 0x8018f9ec },  // blurry sign in pool pump room  
+]
+
+// TODO: Continue from here to keep adding id's and dptr values to code note
 Claudia = [  
 {"location": UprDeckCompartment,      "id": 0xf0, "dptr": 0x19b0000 }, // for some reason the compartment claudia is a different id
 {"location": UprDeckPassagewayInside, "id": 0xf9, "dptr": 0x19b0000 },
@@ -1806,16 +1076,6 @@ Claudia = [
 
 King = [
 {"location": PrivateQuarters,         "id": 0x7f },
-]
-
-CasinoBoss          = 0xf0
-CasinoBossKickOut1  = 0x80190ea4  // "Sir..."
-CasinoBossKickOut2  = 0x80190fd4  // "I'm sorry but we are closed for the day"
-
-
-CasinoKickOut = [
-  {"location": Casino,     "id": CasinoBoss, "fid": Dialogue, "dptr": CasinoBossKickOut1}, // "Sir..."
-  {"location": Casino,     "id": CasinoBoss, "fid": Dialogue, "dptr": CasinoBossKickOut2}, // "I'm sorry but we are closed for the day"
 ]
 
 
@@ -2016,6 +1276,9 @@ InteractionCheevos = [
    "postconditions": trigger_when(once(LocationID() == GuestHallway && IsSpawnedCup() < prev(IsSpawnedCup()))), "preconditions": once(IsSpawnedCup() == 1)},
 {"title": "Clues Clocked", "points": EasyPuzzle, "description": "Discover the clues and then pick up the clock key", "list": PQClock, "type": "missable", "id": 505899,
    "postconditions": trigger_when(once(LocationID() == WaterRoom && IsSpawnedClockKey() < prev(IsSpawnedClockKey()))), "preconditions": once(IsSpawnedClockKey() == 1)},   
+{"title": "Pow.r th. Po.l P.mp", "points": MediumPuzzle, "type": "missable", "description": "View the instruction tooltip and start the pool pump", "list": PoolPump, "id": 497952,
+   "preconditions": once(PoolPumpStarted() == 0), "postconditions": trigger_when(PoolPumpStarted() > prev(PoolPumpStarted())) && never(LocationID() != TerraceLazarette)
+}
 ]
 
 for c in InteractionCheevos {
@@ -2079,7 +1342,6 @@ achievement(
 
 // Casino Achievements
 
-
 function ptrToSlotPayout() => tbyte(0x09FA30)
 
 PlayingSlots    = 0xc9
@@ -2116,7 +1378,7 @@ achievement(
 )
 
 
-PlayingBlackjack   = 0xca
+
 
 
 // Theater
@@ -2201,10 +1463,9 @@ achievement(
 ptrResultsRating         = 0x8009f797
 ptrResultsTotalPlaytime  = 0x80012145
 // these 3 bytes are set this way in the CalcAndReturnResults() function of the game code
-function resultsOnScreen()    => byte(0x1DE614) == 144 && byte(0x1DE615) == 144 && byte(0x1DE616) == 144
+function resultsOnScreen()        => byte(0x1DE614) == 144 && byte(0x1DE615) == 144 && byte(0x1DE616) == 144
 function prevresultsNotOnScreen() => prev(byte(0x1DE614) != 144) && prev(byte(0x1DE615) != 144) && prev(byte(0x1DE616) != 144)
-//function ptrResultsDisplay()  => dword(0x1ffe8c)
-//function ResultsRating()      => dword(0x1ffea4)
+
 
 IntelligenceScore  = dword(0x18baa0)
 SecretsScore       = dword(0x18ba9c)
@@ -2221,9 +1482,11 @@ function ResultsPageRunning() {
     return statePTR() == ResultsPTRAddr && ResultsPTRValue() == ResultsDisplay && prev(ResultsPTRValue()) == ResultsTotalTime
 }
 
+ResultRatingComponent0 = dword(0x9f970)
+ResultRatingComponent1 = dword(0x9f974)
 
 function ratingScore() {
-    return (dword(0x9f974) + dword(0x9f970) * 8)
+    return (ResultRatingComponent1 + ResultRatingComponent0 * 8)
 }
 
 ESPER    = 0xf
@@ -2484,7 +1747,7 @@ rich_presence_conditional_display(gametime() == 0 && playerPuzzleStatus() == 0, 
 rich_presence_display("This should never be seen")
 
 
-
+PlayingBlackjack                = 0xca
 function BlackJackStatus()      => byte(0xA3A68)
 function BlackJackPlayerTotal() => byte(0xA3BBD)
 function BlackJackDealerTotal() => byte(0xA3BBE)
@@ -2552,6 +1815,8 @@ leaderboard(
     format="SECS",
     lower_is_better=true
 )
+
+
 
 
 
