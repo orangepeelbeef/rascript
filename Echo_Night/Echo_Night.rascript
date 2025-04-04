@@ -8,12 +8,36 @@ function ptr(addr) => dword(addr) & 0x1FFFFFFF
 // Config Slots
 function currentConfigSlotAddr()    => dword(0x09FA8C)
 function currentConfigSlot()        => ptr(0x09FA8c)
-function currentInteractionID()     => dword(currentConfigSlot())
-function currentInteractionIDByte() => byte(currentConfigSlot())
-function currentDataPTR()           => dword(currentConfigSlot() + 4)
-function currentDataValue()         => dword(ptr(currentConfigSlot() + 4))
-function currentDataValue2()        => dword(ptr(currentConfigSlot() + 8))
-function currentFunctionID()        => dword(currentConfigSlot() + 0x10)
+//function currentInteractionID()     => dword(currentConfigSlot())
+//function currentInteractionIDByte() => byte(currentConfigSlot())
+//function currentDataPTR()           => dword(currentConfigSlot() + 4)
+//function currentDataValue()         => dword(ptr(currentConfigSlot() + 4))
+//function currentDataValue2()        => dword(ptr(currentConfigSlot() + 8))
+//function currentFunctionID()        => dword(currentConfigSlot() + 0x10)
+
+
+function curSlot() {
+    obj = {
+        // normal 32 bit read of the interaction id
+        "id": dword(currentConfigSlot()),
+        // 8 bit read of the interaction id, ghosts and other objects sometimes use the higher order bits to animate or track states, and in these cases we only look at the first 8 bits
+        "id_byte": byte(currentConfigSlot()),
+        // pointer to data related to the interacting object, used mainly for tooltip/dialogue id's    maps to beginning of a custom encoding ascii block
+        "data_ptr": dword(currentConfigSlot() + 4),
+        // the data value inside the pointer
+        "data_value": dword(ptr(currentConfigSlot() + 4)),
+        // pointer to second data ptr related to interacting object,  used to detect ghost animated state
+        "data2_ptr": dword(currentConfigSlot() +8),
+        // data value inside of data2 ptr  used to detect ghost animated state
+        "data2_value": dword(ptr(currentConfigSlot() + 8)),
+        // id of the function currently active (dialogue/tooltip, etc)
+        "func_id": dword(currentConfigSlot() + 0x10)
+    }
+    return obj
+}
+
+g_current_config_slot = curSlot()
+
 
 
 function GameContinuedState() => dword(0x09F7F0)
@@ -246,6 +270,7 @@ VideoFileLookup = {
 
 function astralPiecesTurnedIn() => byte(0x0A0C6E)
 function casinoGameChips()      => dword(0x0A0CB0)
+
 function playerstanding()       => dword(0x1A3DB4)
 
 
@@ -310,6 +335,7 @@ function IsSpawnedAmusementParkEngagementRing()             => bit0(locationSpaw
 function IsSpawnedKnifeInTrunk()                            => bit0(locationSpawnflags(GrayEndingHouse,0))
 
 function gametime()          => dword(0x1A6B30)
+function gametimebyte()      => byte(0x1A6B30)
 function totalTime()         => dword(0x1A6B48)
 function pedometer()         => dword(0x1A6B4C)
 function playerCondition()   => word(0x1A6B50)
@@ -541,7 +567,7 @@ Cheevos = [
     { "kind": "generic", "title": "Lightbulb Moment", "description": "Always pay attention to your surroundings and turn on the basement light", "location": Basement, "completionbit":  BasementLightSwitchOn, "points": Trivial, "type": "missable"},
     
     { "kind": "extraconditionstrigger", "title": "Life Imitates Art", "description": "View the clue then solve the basement puzzle", "location": Basement, "completionbit":  BasementPuzzleSolved(), "points": Minor, "type": "missable",
-      "conditions": never(LocationID() != Basement) && once(currentFunctionID() == ReadingText  && currentInteractionID() == Painting && currentDataPTR() == PaintingClue)
+      "conditions": never(LocationID() != Basement) && once(g_current_config_slot["func_id"] == ReadingText  && g_current_config_slot["id"] == Painting && g_current_config_slot["data_ptr"] == PaintingClue)
     },
     
     { "kind": "generic", "title": "A G..G..G..Ghost!", "description": "Meet a ghostly girl and mysteriously get rescued", "location": UprDeckPassageway, "completionbit": EncounteredClaudia(), "points": Trivial, "type": "progression", "id": 489270},    
@@ -762,34 +788,14 @@ achievement(
                     once(ConfigSlotInteractionID(0) == HouseWindingKey       && ConfigSlotFunctionID(0) == ReadingText),
                     once(ConfigSlotInteractionID(0) == HouseBed              && ConfigSlotFunctionID(0) == ReadingText),
                     once(ConfigSlotInteractionID(0) == HouseGrandfatherClock && ConfigSlotFunctionID(0) == ReadingText),
-                    once(currentInteractionID() == MinuteHand         && currentFunctionID() == ReadingText),
-                    once(currentInteractionID() == HourHand           && currentFunctionID() == ReadingText),
-                    once(currentInteractionID() == WindingKeyhole     && currentFunctionID() == ReadingText),
+                    once(g_current_config_slot["id"] == MinuteHand        && g_current_config_slot["func_id"] == ReadingText),
+                    once(g_current_config_slot["id"] == HourHand          && g_current_config_slot["func_id"] == ReadingText),
+                    once(g_current_config_slot["id"] == WindingKeyhole    && g_current_config_slot["func_id"] == ReadingText),
                     once(ClockWound() > prev(ClockWound()))),
                     format="percent"
                 )))
 )
 
-
-// Number of configslots to check 
-slotsToCheck = 5
-
-
-// Basement puzzle
-
-// View the painting tooltip, then solve the puzzle by placing the statues correctly
-// in testing this only appeared in config slot1, but using the full selection just in case
-
-
-/*
-achievement(
-    title = "Life Imitates Art", points = Minor, type="missable",
-    description = "View the clue then solve the puzzle",
-    trigger = GameRunning() && never(LocationID() != Basement) &&
-                once(currentFunctionID() == ReadingText  && currentInteractionID() == Painting && currentDataPTR() == PaintingClue) &&
-                trigger_when(BasementPuzzleSolved() > prev(BasementPuzzleSolved()))
-)
-*/
 
 CasinoBoss       = 0x164
 
@@ -805,15 +811,13 @@ achievement(
     trigger = (GameContinuedState() > 0 && LocationID() == prev(LocationID()) && currentConfigSlotAddr() == prev(currentConfigSlotAddr()) && once(SecretLightswitchOn() == 0) &&
               never(GameLoaded()) && never(GameSaved())) &&
               (  
-                once(LocationID() == Casino && currentFunctionID() == ReadingText  && currentInteractionID() == CasinoBoss && currentDataPTR() == LightSwitchClue1) &&
-                once(LocationID() == Casino && currentFunctionID() == ReadingText  && currentInteractionID() == CasinoBoss && currentDataPTR() == LightSwitchClue2) &&
-                once(LocationID() == Casino && currentFunctionID() == None         && currentInteractionID() == CasinoBoss && currentDataPTR() == LightSwitchClue3) &&
+                once(LocationID() == Casino && g_current_config_slot["func_id"] == ReadingText  && g_current_config_slot["id"] == CasinoBoss && g_current_config_slot["data_ptr"] == LightSwitchClue1) &&
+                once(LocationID() == Casino && g_current_config_slot["func_id"] == ReadingText  && g_current_config_slot["id"] == CasinoBoss && g_current_config_slot["data_ptr"] == LightSwitchClue2) &&
+                once(LocationID() == Casino && g_current_config_slot["func_id"] == None         && g_current_config_slot["id"] == CasinoBoss && g_current_config_slot["data_ptr"] == LightSwitchClue3) &&
                 trigger_when(LocationID() == TheaterHallway && SecretLightswitchOn() > prev(SecretLightswitchOn()))
               ) 
 )
 
-
-// collect all four plates ?
 
 achievement(
     title = "Geared Up", points = MinorEvent, type ="missable", id = 505898,
@@ -833,9 +837,6 @@ achievement(
                disable_when(LocationID() == UprDeckPassagewayInside && playerPuzzleStatus() == 0 && playerstanding() == 1 && playerCondition() < prev(playerCondition()), until=GameLoaded())
     )
 )
-
-// happens automatically after speaking with the ghost captain and entering the upr deck passageway
-
 
 // Grabbed With Gusto
 // retrieve the wire cutters from the wall without being hit by the ghost
@@ -1064,6 +1065,7 @@ PoolPump = [
 ]
 
 // TODO: Continue from here to keep adding id's and dptr values to code note
+// do we need to use 19b at all?
 Claudia = [  
 {"location": UprDeckCompartment,      "id": 0xf0, "dptr": 0x19b0000 }, // for some reason the compartment claudia is a different id
 {"location": UprDeckPassagewayInside, "id": 0xf9, "dptr": 0x19b0000 },
@@ -1138,21 +1140,18 @@ function KingPostconditions() {
 function GhostCondition(cheev,repeatvalue,type) {
 
     if type == "king" {
-        return once(currentInteractionIDByte() == cheev["id"] && repeated(repeatvalue, totalTime() > prev(totalTime())))
+        return once(g_current_config_slot["id_byte"] == cheev["id"] && repeated(repeatvalue, totalTime() > prev(totalTime())))
     } else if type == "claudia" {
-        return once(LocationID() == cheev["location"] && currentInteractionIDByte() == cheev["id"] && currentDataValue2() == cheev["dptr"] && repeated(repeatvalue, totalTime() > prev(totalTime())))
+        return once(LocationID() == cheev["location"] && g_current_config_slot["id_byte"] == cheev["id"] && g_current_config_slot["data2_value"] == cheev["dptr"] && repeated(repeatvalue, totalTime() > prev(totalTime())))
     } else {
         assert(false,message="Unable to locate proper type for GhostCondition")
     }
 }
 
 function KingCondition(cheev,repeatvalue) {
-    return once(currentInteractionIDByte() == cheev["id"] && repeated(repeatvalue, totalTime() > prev(totalTime())))
+    return once(g_current_config_slot["id_byte"] == cheev["id"] && repeated(repeatvalue, totalTime() > prev(totalTime())))
 }
 
-
-// 10000f9  8018e7ec
-// 10001f9  8018e758  // creepy laugh
 
 
 // frames per second
@@ -1170,8 +1169,11 @@ function AchievementInteractionFunction(cheev,conditiontype) {
                   measured(tally_of(
                            cheev["list"], length(cheev["list"]),
                            (o) => once(
-                                  LocationID() == o["location"] && currentInteractionID() == o["id"] && currentFunctionID() == o["fid"] && 
-                                  currentDataPTR() == o["dptr"] && prev(currentDataPTR() != o["dptr"])
+                                  LocationID() == o["location"] && 
+                                  g_current_config_slot["id"] == o["id"] && 
+                                  g_current_config_slot["func_id"] == o["fid"] && 
+                                  g_current_config_slot["data_ptr"] == o["dptr"] && 
+                                  prev(g_current_config_slot["data_ptr"] != o["dptr"])
                                   )
                   )) && cheev["postconditions"]
                  
@@ -1183,8 +1185,11 @@ function AchievementInteractionFunction(cheev,conditiontype) {
                   (measured(tally_of(
                            cheev["list"], length(cheev["list"]),
                            (o) => once(
-                                  LocationID() == o["location"] && currentInteractionID() == o["id"] && currentFunctionID() == o["fid"] && 
-                                  currentDataPTR() == o["dptr"] && prev(currentDataPTR() != o["dptr"])
+                                  LocationID() == o["location"] && 
+                                  g_current_config_slot["id"] == o["id"] && 
+                                  g_current_config_slot["func_id"] == o["fid"] && 
+                                  g_current_config_slot["data_ptr"] == o["dptr"] && 
+                                  prev(g_current_config_slot["data_ptr"] != o["dptr"])
                                   )
                   )))
                  
@@ -1196,8 +1201,11 @@ function AchievementInteractionFunction(cheev,conditiontype) {
                   (measured(tally_of(
                            cheev["list"], length(cheev["list"]),
                            (o) => once(
-                                  LocationID() == o["location"] && currentInteractionID() == o["id"] && currentFunctionID() == o["fid"] && 
-                                  currentDataPTR() == o["dptr"] && prev(currentDataPTR() != o["dptr"])
+                                  LocationID() == o["location"] && 
+                                  g_current_config_slot["id"] == o["id"] && 
+                                  g_current_config_slot["func_id"] == o["fid"] && 
+                                  g_current_config_slot["data_ptr"] == o["dptr"] && 
+                                  prev(g_current_config_slot["data_ptr"] != o["dptr"])
                                   )
                   )) && cheev["postconditions"])
     ) 
@@ -1208,8 +1216,11 @@ function AchievementInteractionFunction(cheev,conditiontype) {
                   (measured(tally_of(
                            cheev["list"], length(cheev["list"]),
                            (o) => once(
-                                  LocationID() == o["location"] && currentInteractionID() == o["id"] && currentFunctionID() == o["fid"] && 
-                                  currentDataPTR() == o["dptr"] && prev(currentDataPTR() != o["dptr"])
+                                  LocationID() == o["location"] && 
+                                  g_current_config_slot["id"] == o["id"] && 
+                                  g_current_config_slot["func_id"] == o["fid"] && 
+                                  g_current_config_slot["data_ptr"] == o["dptr"] && 
+                                  prev(g_current_config_slot["data_ptr"] != o["dptr"])
                                   )
                   ))) 
     )
@@ -1316,7 +1327,7 @@ achievement(
     description = "Escape the mess room without being hit by the king",
     trigger = GameRunning() &&
               once(LocationID() == MessRoom && prev(LocationID() == DiningRoomGalley)) &&
-              once(currentInteractionID() == King) &&
+              once(g_current_config_slot["id"] == King) &&
               trigger_when(TalkedToFatherMessRoom() > prev(TalkedToFatherMessRoom())) &&
               never(TakenDamage()) && never(LocationID() != MessRoom) && never(GameLoaded()) && never(GameOver())
 )
@@ -1402,10 +1413,10 @@ achievement(
               // the first time you enter the theater the "In theater entrance" bit is not set for some reason
               // so this ornext covers both cases where you are in the front room
               __ornext(playerInTheaterEntrance() == 1 || (playerInTheater() == 0 && playerInTheaterBackRoom() == 0  && playerInFilmBooth() == 0)) &&
-              once(currentInteractionID() == TheaterEngineer && currentFunctionID() == None && currentDataPTR() == MovieTheater1) &&
-              once(currentInteractionID() == TheaterEngineer && currentFunctionID() == None && currentDataPTR() == MovieTheater2) &&
-              once(currentInteractionID() == TheaterEngineer && currentFunctionID() == None && currentDataPTR() == MovieTheater3) &&
-              once(currentInteractionID() == TheaterEngineer && currentFunctionID() == None && currentDataPTR() == MovieTheater4 && prev(currentDataPTR() != MovieTheater4))
+              once(g_current_config_slot["id"] == TheaterEngineer && g_current_config_slot["func_id"] == None && g_current_config_slot["data_ptr"] == MovieTheater1) &&
+              once(g_current_config_slot["id"] == TheaterEngineer && g_current_config_slot["func_id"] == None && g_current_config_slot["data_ptr"] == MovieTheater2) &&
+              once(g_current_config_slot["id"] == TheaterEngineer && g_current_config_slot["func_id"] == None && g_current_config_slot["data_ptr"] == MovieTheater3) &&
+              once(g_current_config_slot["id"] == TheaterEngineer && g_current_config_slot["func_id"] == None && g_current_config_slot["data_ptr"] == MovieTheater4 && prev(g_current_config_slot["data_ptr"] != MovieTheater4))
 )
 
 // Pier
@@ -1440,7 +1451,7 @@ achievement(
     description = "Ride the carousel before locating the missing item",
     trigger = GameRunning() && LocationID() == AmusementParkCarousel && IsSpawnedAmusementParkEngagementRing() == 1 &&
               currentConfigSlotAddr() == prev(currentConfigSlotAddr()) &&
-              any_of(HORSES, (h) => currentInteractionID() == h && prev(currentInteractionID() != h))
+              any_of(HORSES, (h) => g_current_config_slot["id"] == h && prev(g_current_config_slot["id"] != h))
 )
 
 
@@ -1475,8 +1486,18 @@ ResultsPTRAddr     = 0x801789c0
 
 function ResultsPTRValue() => dword(0x1789c0)
 
-ResultsDisplay   = 0x12cfb0
-ResultsTotalTime = 0x12d2d0
+// ESPER,GENIUS,SUPERIOR values
+ResultsDisplay   = 0x12cfb0    //(0x912cf88)
+ResultsTotalTime = 0x12d2d0   
+
+//Average
+// display = 0x12cf88  //(0x912cf60)
+// time    = 0x12d2a8
+
+// Novice, DONKEY
+// display = 0x12cf38    //(0x912cf10)
+// time    = 0x12d258
+
 function ResultsPageRunning() {
     //return ptr(statePTR()) == 0x12cfb0 && prev(ptr(statePTR()) == 0x12d2d0)
     return statePTR() == ResultsPTRAddr && ResultsPTRValue() == ResultsDisplay && prev(ResultsPTRValue()) == ResultsTotalTime
@@ -1493,6 +1514,8 @@ ESPER    = 0xf
 GENIUS   = 0xe
 SUPERIOR = 0xd  // also average and novice
 DONKEY   = 0xc
+
+
 
 
 achievement(
@@ -1569,7 +1592,27 @@ rich_presence_conditional_display(gameOver() == 1, "☠️-[ Game Over 👣:{1} 
     rich_presence_value("Number", numSaves())
 )
 
+RatingLookup = {
+    0xbf7f: "Donkey",
+    0x9f7f: "Novice",
+    0x7f7f: "Average",
+    0x5f7f: "Superior",
+    0x3f7f: "Genius",
+    0x1f7f: "ESPer",
+}
+
+
+function ratingTest() => dword(0x1de67c)
+function resultsOnScreen2() => dword(0x1de660) == 0x91789c4
+
+rich_presence_conditional_display(GameRunning() && resultsOnScreen2(), "🎬-[ Richard's Rating: {0} 🕰️ {1}]-🎬", 
+    rich_presence_lookup("Rating", ratingTest(), RatingLookup),
+    rich_presence_value("Seconds", totalTime(), format="SECS")    
+)
+
 /*
+
+// these are stack frames, so unreliable
 function Intelligence() => word(0x1ffea0)
 function Physical()     => word(0x1ffea2)
 function Secrets()      => word(0x1ffea4)
@@ -1611,11 +1654,13 @@ SpecialLookup = {
 }
 
 
+// Roulette, Slots, or Blackjack
 rich_presence_conditional_display((CodeFlow() == 0xc8 || CodeFlow() == 0xc9 || CodeFlow() == 0xca), "🤑-[ {0} 🥮:{1} ]-🤑",
     rich_presence_lookup("Special", CodeFlow(), SpecialLookup),
     rich_presence_value("Number", casinoGameChips())
 )
 
+//Watching Endings, Credits, or the Theater film
 rich_presence_conditional_display((CodeFlow() == 0xdc || CodeFlow() == 0xd2 || CodeFlow() == 0xd3 || CodeFlow() == 0xcd ||
         CodeFlow() == 0xd4
     ), "🎬-[ {0} {1} ]-🎬",
@@ -1623,9 +1668,11 @@ rich_presence_conditional_display((CodeFlow() == 0xdc || CodeFlow() == 0xd2 || C
     rich_presence_lookup("VideoFile", filenamePointerForCdRomVideoPlaying(), VideoFileLookup)
 )
 
-rich_presence_conditional_display(playerPuzzleStatus() == 1 && possessed() != 0, "👻-[ POSSESSED Exploring 👻👻👻👻👻 🌎:👻👻👻👻 🩹:👻 👣:👻 🕰️ 👻👻👻👻 💾:👻 ]-👻")
+// Possessed
+rich_presence_conditional_display(GameRunning() && possessed() > 0, "👻-[ POSSESSED Exploring 👻👻👻👻👻 🌎:👻👻👻👻 🩹:👻 👣:👻 🕰️ 👻👻👻👻 💾:👻 ]-👻")
 
 PuzzleLookup = {
+    0x06: "Pouring Drinks",
     0x09: "Trying to Repair the Fusebox",
     0x1b: "Tinkering with a Crow",
     0x1f: "Playing music on the Jukebox",
@@ -1643,7 +1690,8 @@ PuzzleLookup = {
     0x46: "Turning the Engine Valves",
 }
 
-rich_presence_conditional_display(playerPuzzleStatus() == 0 && playerstanding() == 1, "🧩-[ Richard is {0} 🌎:{1} 🩹:{2} 🕰️ {3} 👣:{4} ]-🧩",
+// In a puzzle
+rich_presence_conditional_display(GameRunning() && playerPuzzleStatus() == 0, "🧩-[ Richard is {0} 🌎:{1} 🩹:{2} 🕰️ {3} 👣:{4} ]-🧩",
     rich_presence_lookup("Puzzle", LocationID(), PuzzleLookup),
     rich_presence_lookup("Weather", weather(), WeatherLookup),
     rich_presence_lookup("PlayerCondition", playerCondition(), PlayerConditionLookup),
@@ -1651,7 +1699,7 @@ rich_presence_conditional_display(playerPuzzleStatus() == 0 && playerstanding() 
     rich_presence_value("Number", pedometer())
 )
 
-
+// Escaping the orpheus
 rich_presence_conditional_display((endGameCountdownTimer() > 0 && playerPuzzleStatus() == 1 && LocationID() != 74), "🚨-[ Richard is trying to Escape the Orpheus 🕙 {0} ⏱️: {1} ]-🚨",
     rich_presence_value("Minutes", byte(0x1A6B30) + low4(0x1A6B31) * 90.001406271973, format="MINUTES"),
     rich_presence_value("Number", endGameCountdownTimer())
@@ -1700,7 +1748,7 @@ TimeLocationLookup = {
 }
 
 
-rich_presence_conditional_display(word(LocationID() * 36 + 0x082EC4) >= 10 && dword(0x09FB10) == 1 && dword(0x1A6B30) > word(0x0000FF), "🔎-[ {0} {1} 🌎:{2} 🩹:{3} 👣:{4} 🕰️ {5} 💾:{6} ]-🔎",
+rich_presence_conditional_display(word(LocationID() * 36 + 0x082EC4) >= 10 && dword(0x09FB10) == 1 && gametime() > word(0x0000FF), "🔎-[ {0} {1} 🌎:{2} 🩹:{3} 👣:{4} 🕰️ {5} 💾:{6} ]-🔎",
     rich_presence_lookup("Location", LocationID(), LocationLookup),
     rich_presence_lookup("TimeLocation", LocationID(), TimeLocationLookup),
     rich_presence_lookup("Weather", weather(), WeatherLookup),
@@ -1710,9 +1758,9 @@ rich_presence_conditional_display(word(LocationID() * 36 + 0x082EC4) >= 10 && dw
     rich_presence_value("Number", numSaves())
 )
 
-rich_presence_conditional_display(dword(0x09FB10) == 1 && dword(0x1A6B30) > word(0x0000FF), "🔎-[ {0} 🕙 {1} 🌎:{2} 🩹:{3} 👣:{4} 🕰️ {5} 💾:{6} ]-🔎",
+rich_presence_conditional_display(dword(0x09FB10) == 1 && gametime() > word(0x0000FF), "🔎-[ {0} 🕙 {1} 🌎:{2} 🩹:{3} 👣:{4} 🕰️ {5} 💾:{6} ]-🔎",
     rich_presence_lookup("Location", LocationID(), LocationLookup),
-    rich_presence_value("Minutes", byte(0x1A6B30) / 2.84444 + low4(0x1A6B31) * 90.0014, format="MINUTES"),
+    rich_presence_value("Minutes", gametimebyte() / 2.84444 + low4(0x1A6B31) * 90.0014, format="MINUTES"),
     rich_presence_lookup("Weather", weather(), WeatherLookup),
     rich_presence_lookup("PlayerCondition", playerCondition(), PlayerConditionLookup),
     rich_presence_value("Number", pedometer()),
@@ -1720,6 +1768,9 @@ rich_presence_conditional_display(dword(0x09FB10) == 1 && dword(0x1A6B30) > word
     rich_presence_value("Number", numSaves())
 )
 
+
+// this checks LocationTimeID value for the current location
+// Any values >= 10 are some date other than the present and Date from lookup table is used
 rich_presence_conditional_display(word(LocationID() * 36 + 0x082EC4) >= 10 && dword(0x09FB10) == 1, "🔎-[ {0} {1} 🌎:{2} 🩹:{3} 👣:{4} 🕰️ {5} 💾:{6} ]-🔎",
     rich_presence_lookup("Location", LocationID(), LocationLookup),
     rich_presence_lookup("TimeLocation", LocationID(), TimeLocationLookup),
@@ -1730,9 +1781,10 @@ rich_presence_conditional_display(word(LocationID() * 36 + 0x082EC4) >= 10 && dw
     rich_presence_value("Number", numSaves())
 )
 
+
 rich_presence_conditional_display(dword(0x09FB10) == 1, "🔎-[ {0} 🕙 {1} 🌎:{2} 🩹:{3} 👣:{4} 🕰️ {5} 💾:{6} ]-🔎",
     rich_presence_lookup("Location", LocationID(), LocationLookup),
-    rich_presence_value("Minutes", dword(0x1A6B30) / 2.84444, format="MINUTES"),
+    rich_presence_value("Minutes", gametimebyte() / 2.84444, format="MINUTES"),
     rich_presence_lookup("Weather", weather(), WeatherLookup),
     rich_presence_lookup("PlayerCondition", playerCondition(), PlayerConditionLookup),
     rich_presence_value("Number", pedometer()),
@@ -1815,6 +1867,8 @@ leaderboard(
     format="SECS",
     lower_is_better=true
 )
+
+
 
 
 
