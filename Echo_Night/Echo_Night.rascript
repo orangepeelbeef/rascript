@@ -38,7 +38,8 @@ function curSlot() {
 
 g_current_config_slot = curSlot()
 
-
+ten_seconds     = 10
+thirty_seconds  = 30
 
 function GameContinuedState() => dword(0x09F7F0)
 
@@ -933,7 +934,7 @@ CURES = [
 // this is the same but with cure potions
 
 achievement(
-    title = "Master of Cures", points = HardChallenge, type="missable",
+    title = "Master of Cures", points = MediumChallenge, type="missable",
     description = "Collect Every cure potion",
     trigger = disable_when(GameContinuedState() == 0, until=GameContinuedState() > 0) && saveAndLoadStatus() == 0 &&
               measured(
@@ -1064,23 +1065,25 @@ PoolPump = [
 {"location": TerraceLazarette, "id": 0x25, "fid": ReadingText, "dptr": 0x8018f9ec },  // blurry sign in pool pump room  
 ]
 
-// TODO: Continue from here to keep adding id's and dptr values to code note
-// do we need to use 19b at all?
-Claudia = [  
-{"location": UprDeckCompartment,      "id": 0xf0, "dptr": 0x19b0000 }, // for some reason the compartment claudia is a different id
-{"location": UprDeckPassagewayInside, "id": 0xf9, "dptr": 0x19b0000 },
-{"location": Pilothouse,              "id": 0xf9, "dptr": 0x19b0000 },
-{"location": GuestRoomA,              "id": 0xf9, "dptr": 0x19b0000 },
-{"location": GuestRoomB,              "id": 0xf9, "dptr": 0x19b0000 },
-{"location": GuestHallway,            "id": 0xf9, "dptr": 0x19b0000 },
-{"location": PassengerHallway,        "id": 0xf9, "dptr": 0x19b0000 },
+
+Claudia = [
+    UprDeckCompartment,
+    UprDeckPassagewayInside,
+    Pilothouse,
+    GuestRoomA,
+    GuestRoomB,
+    GuestHallway,
+    PassengerHallway
 ]
+
 
 King = [
-{"location": PrivateQuarters,         "id": 0x7f },
+   Bathroom, 
+   CrewsQuartersA,
+   CrewsQuartersB,
+   EngineCorridor, 
+   ShowerRoom,    
 ]
-
-
 
 function InteractionAchievementPreconditions() { 
     return GameRunning() && never(GameLoaded()) && never(GameOver()) && currentConfigSlotAddr() == prev(currentConfigSlotAddr())
@@ -1091,45 +1094,39 @@ function pauseLockCondition() {
     return disable_when(once(TakenDamage()), until=(GameLoaded() || GameOver() ))
 }
 
-
 function ClaudiaTooEarlyPause() {
-    return disable_when(locationMapBit(AbandonedMineC) == 0, until=(locationMapBit(AbandonedMineC) == 1 || GameLoaded() || GameOver()))
+    return disable_when(locationMapBit(AbandonedMineC) == 0, until=(locationMapBit(AbandonedMineC) == 1))
 }
 
 function KingTooEarlyPause() {
-    return disable_when(HaveCameo() == 0, until=(HaveCameo() == 1 || GameLoaded() || GameOver()))
+    return disable_when(HaveCameo() == 0, until=(HaveCameo() == 1))
 }
 
-function statePTR() => dword(0x9f920)
-PausedOrMenu    = 0x801849c0  // seems to be set when a menu is up or the game is paused
-ResultsScreen   = 0x801789c0  // results screen up
+//function statePTR() => dword(0x9f920)
+//PausedOrMenu    = 0x801849c0  // seems to be set when a menu is up or the game is paused
+//ResultsScreen   = 0x801789c0  // results screen up
 
 
-function pauseWhenGamePaused() {
-    return disable_when(statePTR() == PausedOrMenu, until=statePTR() != PausedOrMenu)
-}
-
-
-function ClaudiaPauseLock() {
-    return disable_when((locationMapBit(AbandonedMineC) == 1 && IsSpawnedClaudiasDoll() == 0 && TakenDamage()), until=(GameLoaded() || GameOver() ))
-}
 
 // Make sure that we don't start counting claudia interactions until the doll is picked up. At this point all of claudias locations are available.
 // Hopefully this encourages player to make a save after getting the doll and before returning it to do this achievement
 // reset if player takes damage, pause lock until gameload
+
 function ClaudiaPreconditions() {
-    return ClaudiaTooEarlyPause() &&
-          InteractionAchievementPreconditions() && never(TakenDamage()) && 
-          pauseLockCondition()
+    return ClaudiaTooEarlyPause() && 
+         GameRunning() && never(GameLoaded()) && never(GameOver()) && never(TakenDamage()) &&
+         pauseLockCondition()
 }
+
 
 function ClaudiaPostconditions() {
     return ClaudiaDollReturned() > prev(ClaudiaDollReturned())
 }
 
+
 function KingPreconditions() {
     return KingTooEarlyPause() &&
-         InteractionAchievementPreconditions() && never(TakenDamage()) && never(LocationID() != PrivateQuarters) &&
+         GameRunning() && never(GameLoaded()) && never(GameOver()) && never(TakenDamage()) &&
          pauseLockCondition()
 }
 
@@ -1137,29 +1134,21 @@ function KingPostconditions() {
     return KingGivenCameo() > prev(KingGivenCameo())
 }
 
-function GhostCondition(cheev,repeatvalue,type) {
-
-    if type == "king" {
-        return once(g_current_config_slot["id_byte"] == cheev["id"] && repeated(repeatvalue, totalTime() > prev(totalTime())))
-    } else if type == "claudia" {
-        return once(LocationID() == cheev["location"] && g_current_config_slot["id_byte"] == cheev["id"] && g_current_config_slot["data2_value"] == cheev["dptr"] && repeated(repeatvalue, totalTime() > prev(totalTime())))
-    } else {
-        assert(false,message="Unable to locate proper type for GhostCondition")
-    }
+function GhostChaseAIActive() {
+    return word(0x1c4368) == 1
 }
 
-function KingCondition(cheev,repeatvalue) {
-    return once(g_current_config_slot["id_byte"] == cheev["id"] && repeated(repeatvalue, totalTime() > prev(totalTime())))
+GhostRespawnTimer = dword(0x1dea18)
+
+
+// GhostCycleTimer dropping from 1 -> 0 is a completed ghost cycle.  Ghost despawns until timer
+function GhostCycleComplete() { 
+  return GhostChaseAIActive() && GhostRespawnTimer == 0 && prev(GhostRespawnTimer) == 1
 }
 
-
-
-// frames per second
-//fps             = 60
-
-// Use totalTime() which is actual seconds.  game pauses timer when in menu and paused already, so better than counting frame hits
-ten_seconds     = 10
-thirty_seconds  = 30
+function GhostCondition(loc) {
+    return once(LocationID() == loc && GhostCycleComplete())
+}
 
 function AchievementInteractionFunction(cheev,conditiontype) {
    if conditiontype == "post" {
@@ -1228,17 +1217,17 @@ function AchievementInteractionFunction(cheev,conditiontype) {
         achievement(
         title = cheev["title"], points = cheev["points"], description = cheev["description"], type = cheev["type"], id=id_or_zero(cheev),
         trigger = (ClaudiaPreconditions()) &&
-                  (measured(tally_of(
-                           cheev["list"], length(cheev["list"]), (o) => GhostCondition(o,ten_seconds,"claudia")
-                  )) && trigger_when(ClaudiaPostconditions()))
+                  ((measured(tally_of(
+                           cheev["list"], length(cheev["list"]), (o) => GhostCondition(o)
+                  )) && trigger_when(ClaudiaPostconditions())) || (trigger_when(always_false())))
     )
   } else if conditiontype == "king" {
         achievement(
         title = cheev["title"], points = cheev["points"], description = cheev["description"], type = cheev["type"], id=id_or_zero(cheev),
         trigger = (KingPreconditions()) &&
-                  (measured(tally_of(
-                           cheev["list"], length(cheev["list"]), (o) => GhostCondition(o,thirty_seconds,"king")
-                  ), format="percent") && trigger_when(KingPostconditions()))
+                  ((measured(tally_of(
+                           cheev["list"], length(cheev["list"]), (o) => GhostCondition(o)
+                  ), format="percent") && trigger_when(KingPostconditions())) || (trigger_when(always_false())))
     )      
   } else {
       assert(false,message="Condition type error with  " + conditiontype)
@@ -1249,8 +1238,8 @@ function AchievementInteractionFunction(cheev,conditiontype) {
 
 
 ClaudiaCheevos = [
-    {"title": "I Ain't Afraid of No Ghost Girl", "points": HardChallenge, "description": "After retrieving Claudia's doll, spend 10 seconds with Claudia in every room she haunts and then return her doll without being damaged", "ghost": "claudia", "list": Claudia, "type": "missable", "id": 490702 },
-    {"title": "I Ain't Afraid of No Ghost King", "points": MediumChallenge, "description": "After retrieving the King's cameo, spend 30 seconds with the King and then return the cameo without being damaged", "ghost": "king", "list": King, "type": "missable", "id": 505879 },
+    {"title": "I Ain't Afraid of No Ghost Girl", "points": HardChallenge, "description": "After retrieving Claudia's doll, spend a full cycle with Claudia in every room she haunts and then return her doll without being damaged", "ghost": "claudia", "list": Claudia, "type": "missable", "id": 490702 },
+    {"title": "I Ain't Afraid of No Ghost King", "points": HardChallenge, "description": "After retrieving the King's cameo, spend a full cycle with the King in every room he haunts and then return the cameo without being damaged", "ghost": "king", "list": King, "type": "missable", "id": 505879 },
 ]
 
 for c in ClaudiaCheevos {
@@ -1470,64 +1459,29 @@ achievement(
 
 // ratings
 
-
-ptrResultsRating         = 0x8009f797
-ptrResultsTotalPlaytime  = 0x80012145
-// these 3 bytes are set this way in the CalcAndReturnResults() function of the game code
-function resultsOnScreen()        => byte(0x1DE614) == 144 && byte(0x1DE615) == 144 && byte(0x1DE616) == 144
-function prevresultsNotOnScreen() => prev(byte(0x1DE614) != 144) && prev(byte(0x1DE615) != 144) && prev(byte(0x1DE616) != 144)
-
-
-IntelligenceScore  = dword(0x18baa0)
-SecretsScore       = dword(0x18ba9c)
-PhysicalScore      = dword(0x18ba08)
-
-ResultsPTRAddr     = 0x801789c0
-
-function ResultsPTRValue() => dword(0x1789c0)
-
-// ESPER,GENIUS,SUPERIOR values
-ResultsDisplay   = 0x12cfb0    //(0x912cf88)
-ResultsTotalTime = 0x12d2d0   
-
-//Average
-// display = 0x12cf88  //(0x912cf60)
-// time    = 0x12d2a8
-
-// Novice, DONKEY
-// display = 0x12cf38    //(0x912cf10)
-// time    = 0x12d258
-
+// several unique values could have been chosen for the rating, but i picked this one
+function ratingValue()          => dword(0x1de67c)
+// this catches the moment it changes from rendering int/phys/secrets to the ranking/total playtime 
+function resultsFirstRendered() => dword(0x1de660) == 0x91789c4 && prev(dword(0x1de660)) == 0x9000000
+// used for RP
 function ResultsPageRunning() {
-    //return ptr(statePTR()) == 0x12cfb0 && prev(ptr(statePTR()) == 0x12d2d0)
-    return statePTR() == ResultsPTRAddr && ResultsPTRValue() == ResultsDisplay && prev(ResultsPTRValue()) == ResultsTotalTime
+    return dword(0x1de660) == 0x91789c4
 }
 
-ResultRatingComponent0 = dword(0x9f970)
-ResultRatingComponent1 = dword(0x9f974)
 
-function ratingScore() {
-    return (ResultRatingComponent1 + ResultRatingComponent0 * 8)
-}
-
-ESPER    = 0xf
-GENIUS   = 0xe
-SUPERIOR = 0xd  // also average and novice
-DONKEY   = 0xc
-
-
-
+ESPER    = 0x1f7f
+GENIUS   = 0x3f7f
 
 achievement(
     title = "Ranked: Esper", points = HardChallenge,
     description = "Complete the game with an ESPer rating",
-    trigger = GameRunning() && resultsOnScreen() && ResultsPageRunning() && ratingScore() == ESPER
+    trigger = GameRunning() && resultsFirstRendered() && ratingValue() == ESPER
 )
 
 achievement(
     title = "Ranked: Genius", points = MediumChallenge,
     description = "Complete the game with a Genius or higher rating",
-    trigger = GameRunning() && resultsOnScreen() && ResultsPageRunning() && ratingScore() >= GENIUS
+    trigger = GameRunning() && resultsFirstRendered() && ratingValue() >= GENIUS
 )
 
 //ENDINGS
@@ -1553,7 +1507,7 @@ achievement(
     title = "Conclusion: Lost at Sea", points = 0,
     description = "Time runs out and Richard vanishes along with the Orpheus",
     id = 473924, 
-    trigger = GameRunning() && CodeFlow() == EndingMissing && resultsOnScreen() && prevresultsNotOnScreen()
+    trigger = GameRunning() && CodeFlow() == EndingMissing && resultsFirstRendered()
 )
 
 // True ending
@@ -1602,45 +1556,10 @@ RatingLookup = {
 }
 
 
-function ratingTest() => dword(0x1de67c)
-function resultsOnScreen2() => dword(0x1de660) == 0x91789c4
-
-rich_presence_conditional_display(GameRunning() && resultsOnScreen2(), "🎬-[ Richard's Rating: {0} 🕰️ {1}]-🎬", 
-    rich_presence_lookup("Rating", ratingTest(), RatingLookup),
+rich_presence_conditional_display(GameRunning() && ResultsPageRunning(), "🎬-[ Richard's Rating: {0} 🕰️ {1}]-🎬", 
+    rich_presence_lookup("Rating", ratingValue(), RatingLookup, "???"),
     rich_presence_value("Seconds", totalTime(), format="SECS")    
 )
-
-/*
-
-// these are stack frames, so unreliable
-function Intelligence() => word(0x1ffea0)
-function Physical()     => word(0x1ffea2)
-function Secrets()      => word(0x1ffea4)
-
-RatingLookup = {
-    0x2f:  "Donkey",
-    0xe6:  "Average",
-    0x9d:  "Superior",
-    0xc1:  "Genius",
-    0x10a: "ESPer",
-}
-
-
-rich_presence_conditional_display(resultsOnScreen() && ptrResultsDisplay() == ptrResultsTotalPlaytime, "Richard's Results I:{0} P:{1} S:{2} R:{3}", 
-    rich_presence_value("Number", Intelligence()),
-    rich_presence_value("Number", Physical()),
-    rich_presence_value("Number", Secrets()),
-    rich_presence_lookup("Rating", prior(ResultsRating()), RatingLookup)
-)
-
-rich_presence_conditional_display(resultsOnScreen() && ptrResultsDisplay() == ptrResultsRating, "Richard's Results I:{0} P:{1} S:{2} R:{3}", 
-    rich_presence_value("Number", Intelligence()),
-    rich_presence_value("Number", Physical()),
-    rich_presence_value("Number", Secrets()),
-    rich_presence_lookup("Rating", ResultsRating(), RatingLookup)
-)
-*/
-
 
 SpecialLookup = {
     0xc8: "🔴 or ⚫?: Richard is playing Roulette ",
@@ -1656,7 +1575,7 @@ SpecialLookup = {
 
 // Roulette, Slots, or Blackjack
 rich_presence_conditional_display((CodeFlow() == 0xc8 || CodeFlow() == 0xc9 || CodeFlow() == 0xca), "🤑-[ {0} 🥮:{1} ]-🤑",
-    rich_presence_lookup("Special", CodeFlow(), SpecialLookup),
+    rich_presence_lookup("Special", CodeFlow(), SpecialLookup, "???"),
     rich_presence_value("Number", casinoGameChips())
 )
 
@@ -1664,8 +1583,8 @@ rich_presence_conditional_display((CodeFlow() == 0xc8 || CodeFlow() == 0xc9 || C
 rich_presence_conditional_display((CodeFlow() == 0xdc || CodeFlow() == 0xd2 || CodeFlow() == 0xd3 || CodeFlow() == 0xcd ||
         CodeFlow() == 0xd4
     ), "🎬-[ {0} {1} ]-🎬",
-    rich_presence_lookup("Special", CodeFlow(), SpecialLookup),
-    rich_presence_lookup("VideoFile", filenamePointerForCdRomVideoPlaying(), VideoFileLookup)
+    rich_presence_lookup("Special", CodeFlow(), SpecialLookup, "???"),
+    rich_presence_lookup("VideoFile", filenamePointerForCdRomVideoPlaying(), VideoFileLookup, "???")
 )
 
 // Possessed
@@ -1692,9 +1611,9 @@ PuzzleLookup = {
 
 // In a puzzle
 rich_presence_conditional_display(GameRunning() && playerPuzzleStatus() == 0, "🧩-[ Richard is {0} 🌎:{1} 🩹:{2} 🕰️ {3} 👣:{4} ]-🧩",
-    rich_presence_lookup("Puzzle", LocationID(), PuzzleLookup),
-    rich_presence_lookup("Weather", weather(), WeatherLookup),
-    rich_presence_lookup("PlayerCondition", playerCondition(), PlayerConditionLookup),
+    rich_presence_lookup("Puzzle", LocationID(), PuzzleLookup, "???"),
+    rich_presence_lookup("Weather", weather(), WeatherLookup, "???"),
+    rich_presence_lookup("PlayerCondition", playerCondition(), PlayerConditionLookup, "???"),
     rich_presence_value("Seconds", totalTime(), format="SECS"),
     rich_presence_value("Number", pedometer())
 )
@@ -1749,20 +1668,20 @@ TimeLocationLookup = {
 
 
 rich_presence_conditional_display(word(LocationID() * 36 + 0x082EC4) >= 10 && dword(0x09FB10) == 1 && gametime() > word(0x0000FF), "🔎-[ {0} {1} 🌎:{2} 🩹:{3} 👣:{4} 🕰️ {5} 💾:{6} ]-🔎",
-    rich_presence_lookup("Location", LocationID(), LocationLookup),
-    rich_presence_lookup("TimeLocation", LocationID(), TimeLocationLookup),
-    rich_presence_lookup("Weather", weather(), WeatherLookup),
-    rich_presence_lookup("PlayerCondition", playerCondition(), PlayerConditionLookup),
+    rich_presence_lookup("Location", LocationID(), LocationLookup, "???"),
+    rich_presence_lookup("TimeLocation", LocationID(), TimeLocationLookup, "???"),
+    rich_presence_lookup("Weather", weather(), WeatherLookup, "???"),
+    rich_presence_lookup("PlayerCondition", playerCondition(), PlayerConditionLookup, "???"),
     rich_presence_value("Number", pedometer()),
     rich_presence_value("Seconds", totalTime(), format="SECS"),
     rich_presence_value("Number", numSaves())
 )
 
 rich_presence_conditional_display(dword(0x09FB10) == 1 && gametime() > word(0x0000FF), "🔎-[ {0} 🕙 {1} 🌎:{2} 🩹:{3} 👣:{4} 🕰️ {5} 💾:{6} ]-🔎",
-    rich_presence_lookup("Location", LocationID(), LocationLookup),
+    rich_presence_lookup("Location", LocationID(), LocationLookup, "???"),
     rich_presence_value("Minutes", gametimebyte() / 2.84444 + low4(0x1A6B31) * 90.0014, format="MINUTES"),
-    rich_presence_lookup("Weather", weather(), WeatherLookup),
-    rich_presence_lookup("PlayerCondition", playerCondition(), PlayerConditionLookup),
+    rich_presence_lookup("Weather", weather(), WeatherLookup, "???"),
+    rich_presence_lookup("PlayerCondition", playerCondition(), PlayerConditionLookup, "???"),
     rich_presence_value("Number", pedometer()),
     rich_presence_value("Seconds", totalTime(), format="SECS"),
     rich_presence_value("Number", numSaves())
@@ -1772,10 +1691,10 @@ rich_presence_conditional_display(dword(0x09FB10) == 1 && gametime() > word(0x00
 // this checks LocationTimeID value for the current location
 // Any values >= 10 are some date other than the present and Date from lookup table is used
 rich_presence_conditional_display(word(LocationID() * 36 + 0x082EC4) >= 10 && dword(0x09FB10) == 1, "🔎-[ {0} {1} 🌎:{2} 🩹:{3} 👣:{4} 🕰️ {5} 💾:{6} ]-🔎",
-    rich_presence_lookup("Location", LocationID(), LocationLookup),
-    rich_presence_lookup("TimeLocation", LocationID(), TimeLocationLookup),
-    rich_presence_lookup("Weather", weather(), WeatherLookup),
-    rich_presence_lookup("PlayerCondition", playerCondition(), PlayerConditionLookup),
+    rich_presence_lookup("Location", LocationID(), LocationLookup, "???"),
+    rich_presence_lookup("TimeLocation", LocationID(), TimeLocationLookup, "???"),
+    rich_presence_lookup("Weather", weather(), WeatherLookup, "???"),
+    rich_presence_lookup("PlayerCondition", playerCondition(), PlayerConditionLookup, "???"),
     rich_presence_value("Number", pedometer()),
     rich_presence_value("Seconds", totalTime(), format="SECS"),
     rich_presence_value("Number", numSaves())
@@ -1783,20 +1702,20 @@ rich_presence_conditional_display(word(LocationID() * 36 + 0x082EC4) >= 10 && dw
 
 
 rich_presence_conditional_display(dword(0x09FB10) == 1, "🔎-[ {0} 🕙 {1} 🌎:{2} 🩹:{3} 👣:{4} 🕰️ {5} 💾:{6} ]-🔎",
-    rich_presence_lookup("Location", LocationID(), LocationLookup),
+    rich_presence_lookup("Location", LocationID(), LocationLookup, "???"),
     rich_presence_value("Minutes", gametimebyte() / 2.84444, format="MINUTES"),
-    rich_presence_lookup("Weather", weather(), WeatherLookup),
-    rich_presence_lookup("PlayerCondition", playerCondition(), PlayerConditionLookup),
+    rich_presence_lookup("Weather", weather(), WeatherLookup, "???"),
+    rich_presence_lookup("PlayerCondition", playerCondition(), PlayerConditionLookup, "???"),
     rich_presence_value("Number", pedometer()),
     rich_presence_value("Seconds", totalTime(), format="SECS"),
     rich_presence_value("Number", numSaves())
 )
 
 rich_presence_conditional_display(gametime() == 0 && playerPuzzleStatus() == 0, "🤔-[ Richard is Mentally Preparing to Play Echo Night {0} ]-🤔",
-    rich_presence_lookup("VideoFile", filenamePointerForCdRomVideoPlaying(), VideoFileLookup)
+    rich_presence_lookup("VideoFile", filenamePointerForCdRomVideoPlaying(), VideoFileLookup, "???")
 )
 
-rich_presence_display("This should never be seen")
+rich_presence_display("Oh no, this should never be seen!")
 
 
 PlayingBlackjack                = 0xca
@@ -1823,15 +1742,15 @@ leaderboard(
 )
 
 function grayEndingResults() {
-    return GameRunning() && LocationID() == GrayEndingHouse && resultsOnScreen() && prevresultsNotOnScreen()
+    return GameRunning() && LocationID() == GrayEndingHouse && resultsFirstRendered()
 }
 
 function evilEndingResults() {
-    return GameRunning() && LocationID() == House && resultsOnScreen() && prevresultsNotOnScreen()
+    return GameRunning() && LocationID() == House && resultsFirstRendered()
 }
 
 function trueEndingResults() {
-    return GameRunning() && LocationID() == CompartmentA && resultsOnScreen() && prevresultsNotOnScreen()
+    return GameRunning() && LocationID() == CompartmentA && resultsFirstRendered()
 }
 
 
@@ -1867,13 +1786,4 @@ leaderboard(
     format="SECS",
     lower_is_better=true
 )
-
-
-
-
-
-
-
-
-
 
