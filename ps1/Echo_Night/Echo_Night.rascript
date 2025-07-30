@@ -8,13 +8,6 @@ function ptr(addr) => dword(addr) & 0x1FFFFFFF
 // Config Slots
 function currentConfigSlotAddr()    => dword(0x09FA8C)
 function currentConfigSlot()        => ptr(0x09FA8c)
-//function currentInteractionID()     => dword(currentConfigSlot())
-//function currentInteractionIDByte() => byte(currentConfigSlot())
-//function currentDataPTR()           => dword(currentConfigSlot() + 4)
-//function currentDataValue()         => dword(ptr(currentConfigSlot() + 4))
-//function currentDataValue2()        => dword(ptr(currentConfigSlot() + 8))
-//function currentFunctionID()        => dword(currentConfigSlot() + 0x10)
-
 
 function curSlot() {
     obj = {
@@ -73,100 +66,99 @@ function EnteredRoom(location, via) {
 }
 
 LocationLookup = {
-    0x00: "Exploring Upr Deck - Pilothouse",
-    0x01: "Exploring Upr Deck - Passageway Outside",
-    0x02: "Exploring Upr Deck - Chart Room",
-    0x03: "Exploring Upr Deck - Captain's Cabin",
-    0x04: "Exploring Upr Deck - Compartment",
-    0x05: "Exploring Floor 1 - Reading Room",
-    0x06: "Exploring Floor 1 - Lounge",
-    0x07: "Exploring Floor 1 - Electrical Room",
-    0x08: "Exploring Floor 1 - Grand Dining Room",
-    0x09: "Exploring Upr Deck - Passageway Inside",
-    0x0a: "Exploring Floor 1 - Engineer Hallway",
-    0x0b: "Exploring Floor 1 - Passenger Hallway",
-    0x0c: "Exploring Floor 1 - Guest Hallway",
-    0x0d: "Exploring Floor 1 - Dining Room Hallway",
-    0x0e: "Exploring Floor 2 - Child Room",
-    0x0f: "Exploring Floor 1 - Guest Room A",
-    0x10: "Exploring Floor 1 - Guest Room B",
-    0x11: "Exploring Floor 1 - Guest Room C",
-    0x12: "Exploring Floor 1 - Guest Room D",
-    0x13: "Exploring Floor 1 - Special Guest Room",
-    0x14: "Exploring The Past - Pier",
-    0x15: "Exploring Floor 2 - Medical Office",
-    0x16: "Exploring The Past - Castle",
-    0x17: "Exploring The Past - Castle Terrace",
-    0x18: "Exploring The Past - Laboratory",
-    0x19: "Exploring Floor 2 - Theater",
-    0x1a: "Exploring Floor 2 - Mess Room",
-    0x1b: "Exploring Floor 1 - Stairway",
-    0x1c: "Exploring Floor 2 - Engineer's Room",
-    0x1d: "Exploring Lwr Deck - Pool",
-    0x1e: "Exploring Floor 1 - Dining Room Galley",
-    0x1f: "Exploring Floor 2 - Casino",
-    0x20: "Exploring Floor 2 - Radio Room",
-    0x21: "Exploring The Past - Steam Locomotive",
-    0x22: "Exploring Floor 2 - Shower Room",
-    0x23: "Exploring Floor 2 - Bathroom",
-    0x24: "Exploring Floor 2 - Port Corridor",
-    0x25: "Exploring Floor 2 - Starboard Corridor",
-    0x26: "Exploring Floor 2 - Engine Corridor",
-    0x27: "Exploring Lwr Deck - Deck Terrace",
-    0x28: "Exploring Floor 1 - Private Quarters",
-    0x29: "Exploring The Past - Cathedral",
-    0x2a: "Exploring Floor 2 - Theater Hallway",
-    0x2b: "Exploring The Past - Cemetery Graveyard",
-    0x2c: "Exploring Lwr Deck - Terrace Lazarette",
-    0x2d: "Exploring Floor 2 - Crew's Corridor",
-    0x2e: "Exploring Lwr Deck - Stern Passageway",
-    0x2f: "Exploring Floor 1 - Water Room",
-    0x30: "Exploring Floor 1 - Forest Room",
-    0x31: "Exploring Floor 1 - Sky Room",
-    0x32: "Exploring Floor 1 - Fire Room",
-    0x33: "Exploring Floor 1 - Owner's Quarters",
-    0x34: "Exploring Floor 2 - Crew's Quarters B",
-    0x35: "Exploring Floor 2 - Crew's Quarters A",
-    0x36: "Exploring The Past - Library",
-    0x37: "Exploring Father's House",
-    0x38: "Exploring Living Room",
-    0x39: "Exploring Basement",
-    0x3a: "Exploring The Past - Abandoned Mine A",
-    0x3b: "Exploring The Past - Abandoned Mine B",
-    0x3c: "Exploring the Past - Abandoned Mine C",
-    0x3d: "Exploring The Past - Observatory A",
-    0x3e: "Exploring The Past - Observatory B",
-    0x3f: "Exploring The Past - Cemetery Crypt A",
-    0x40: "Exploring The Past - Cemetery Crypt B",
-    0x41: "Exploring Floor 3 - Engine Room B",
-    0x42: "Exploring Floor 3 - Engine Room A",
-    0x43: "Exploring Floor 3 - Stern Passageway",
-    0x44: "Exploring Floor 3 - Boiler A",
-    0x45: "Exploring Floor 3 - Boiler B",
-    0x46: "Exploring Floor 3 - Fuel Storage",
-    0x47: "Exploring The Past - Cathedral Basement",
-    0x48: "Exploring Floor 3 - Compartment B",
-    0x49: "Exploring The Past - Cathedral Stairway",
-    0x4a: "Exploring Floor 3 - Compartment A",
-    0x4b: "Exploring The Past - Amusement Park Fountain",
-    0x4c: "Exploring The Past - Amusement Park Carousel",
-    0x4d: "Exploring The Past - King's Quarters",
-    0x4e: "Exploring Lwr Deck - Corridor to Pool",
-    0x4f: "Exploring The Past - House",
-    0x50: "📽️: Flyby of The Castle",
-    0x51: "📽️: Flyby of The Orpheus",
-    0x52: "📽️: Flyby of The House",
-    0x53: "📽️: Going into the Cathedral",
-    0x54: "📽️: Train heading into tunnel",
-    0x55: "📽️: Boarding the train at East Anchor Station",
-    0x56: "📽️: Escorted to the House",
-    0x57: "📽️: Watching the Gray Ending",
-    0x58: "📽️: Flyby of The Library",
-    0x59: "📽️: Going into the Abandoned Mine",
-    0x5a: "📽️: Flyby of The Laboratory",
-    0x5b: "📽️: Flyby of The Observatory",
-    0x5c: "Unused",
-    0x5d: "Exploring The Past - House(Outside)",
+    0x00: "exploring Upr Deck - Pilothouse",
+    0x01: "exploring Upr Deck - Passageway Outside",
+    0x02: "exploring Upr Deck - Chart Room",
+    0x03: "exploring Upr Deck - Captain's Cabin",
+    0x04: "exploring Upr Deck - Compartment",
+    0x05: "exploring Floor 1 - Reading Room",
+    0x06: "exploring Floor 1 - Lounge",
+    0x07: "exploring Floor 1 - Electrical Room",
+    0x08: "exploring Floor 1 - Grand Dining Room",
+    0x09: "exploring Upr Deck - Passageway Inside",
+    0x0a: "exploring Floor 1 - Engineer Hallway",
+    0x0b: "exploring Floor 1 - Passenger Hallway",
+    0x0c: "exploring Floor 1 - Guest Hallway",
+    0x0d: "exploring Floor 1 - Dining Room Hallway",
+    0x0e: "exploring Floor 2 - Child Room",
+    0x0f: "exploring Floor 1 - Guest Room A",
+    0x10: "exploring Floor 1 - Guest Room B",
+    0x11: "exploring Floor 1 - Guest Room C",
+    0x12: "exploring Floor 1 - Guest Room D",
+    0x13: "exploring Floor 1 - Special Guest Room",
+    0x14: "exploring The Past - Pier",
+    0x15: "exploring Floor 2 - Medical Office",
+    0x16: "exploring The Past - Castle",
+    0x17: "exploring The Past - Castle Terrace",
+    0x18: "exploring The Past - Laboratory",
+    0x19: "exploring Floor 2 - Theater",
+    0x1a: "exploring Floor 2 - Mess Room",
+    0x1b: "exploring Floor 1 - Stairway",
+    0x1c: "exploring Floor 2 - Engineer's Room",
+    0x1d: "exploring Lwr Deck - Pool",
+    0x1e: "exploring Floor 1 - Dining Room Galley",
+    0x1f: "exploring Floor 2 - Casino",
+    0x20: "exploring Floor 2 - Radio Room",
+    0x21: "exploring The Past - Steam Locomotive",
+    0x22: "exploring Floor 2 - Shower Room",
+    0x23: "exploring Floor 2 - Bathroom",
+    0x24: "exploring Floor 2 - Port Corridor",
+    0x25: "exploring Floor 2 - Starboard Corridor",
+    0x26: "exploring Floor 2 - Engine Corridor",
+    0x27: "exploring Lwr Deck - Deck Terrace",
+    0x28: "exploring Floor 1 - Private Quarters",
+    0x29: "exploring The Past - Cathedral",
+    0x2a: "exploring Floor 2 - Theater Hallway",
+    0x2b: "exploring The Past - Cemetery Graveyard",
+    0x2c: "exploring Lwr Deck - Terrace Lazarette",
+    0x2d: "exploring Floor 2 - Crew's Corridor",
+    0x2e: "exploring Lwr Deck - Stern Passageway",
+    0x2f: "exploring Floor 1 - Water Room",
+    0x30: "exploring Floor 1 - Forest Room",
+    0x31: "exploring Floor 1 - Sky Room",
+    0x32: "exploring Floor 1 - Fire Room",
+    0x33: "exploring Floor 1 - Owner's Quarters",
+    0x34: "exploring Floor 2 - Crew's Quarters B",
+    0x35: "exploring Floor 2 - Crew's Quarters A",
+    0x36: "exploring The Past - Library",
+    0x37: "exploring Father's House",
+    0x38: "exploring Living Room",
+    0x39: "exploring Basement",
+    0x3a: "exploring The Past - Abandoned Mine A",
+    0x3b: "exploring The Past - Abandoned Mine B",
+    0x3c: "exploring the Past - Abandoned Mine C",
+    0x3d: "exploring The Past - Observatory A",
+    0x3e: "exploring The Past - Observatory B",
+    0x3f: "exploring The Past - Cemetery Crypt A",
+    0x40: "exploring The Past - Cemetery Crypt B",
+    0x41: "exploring Floor 3 - Engine Room B",
+    0x42: "exploring Floor 3 - Engine Room A",
+    0x43: "exploring Floor 3 - Stern Passageway",
+    0x44: "exploring Floor 3 - Boiler A",
+    0x45: "exploring Floor 3 - Boiler B",
+    0x46: "exploring Floor 3 - Fuel Storage",
+    0x47: "exploring The Past - Cathedral Basement",
+    0x48: "exploring Floor 3 - Compartment B",
+    0x49: "exploring The Past - Cathedral Stairway",
+    0x4a: "exploring Floor 3 - Compartment A",
+    0x4b: "exploring The Past - Amusement Park Fountain",
+    0x4c: "exploring The Past - Amusement Park Carousel",
+    0x4d: "exploring The Past - King's Quarters",
+    0x4e: "exploring Lwr Deck - Corridor to Pool",
+    0x4f: "exploring The Past - House",
+    0x50: "watching a flyby of the castle",
+    0x51: "watching a flyby of the Orpheus",
+    0x52: "watching a flyby of the house",
+    0x53: "watching cathedral entry",
+    0x54: "watching train enter tunnel",
+    0x55: "watching someone board the train at East Anchor terminal",
+    0x56: "being escorted to the house",
+    0x57: "watching the gray ending",
+    0x58: "watching a flyby of the library",
+    0x59: "watching abandoned mine entry",
+    0x5a: "watching a flyby of the laboratory",
+    0x5b: "watching a flyby of the observatory",
+    0x5d: "exploring The Past - House(Outside)",
 }
 
 
@@ -260,13 +252,13 @@ function playerPuzzleStatus()                  => dword(0x09FB10)
 function filenamePointerForCdRomVideoPlaying() => dword(0x09FB24)
 
 VideoFileLookup = {
-    0x800862a8: "📽️: Watching a Strange Film",
-    0x80086300: "📽️: Watching the Best Ending",
-    0x800862d4: "📽️: Watching the Orpheus Rise into the Light",
-    0x80086250: "📽️: Watching the Game Trailer",
-    0x8008627c: ": Looking at the Menu Screen",
-    0x80086224: "📽️: CZ3 Division Logo",
-    0x8008632c: "📽️: Agetec & Fromsoft Logo",
+    0x800862a8: "Watching a strange film",
+    0x80086300: "Watching the best ending",
+    0x800862d4: "Watching the Orpheus rise into the light",
+    0x80086250: "Watching the game trailer",
+    0x8008627c: "Admiring the menu screen",
+    0x80086224: "Admiring the CZ3 Division logo",
+    0x8008632c: "Admiring the Agetec & Fromsoft Logo",
 }
 
 function astralPiecesTurnedIn() => byte(0x0A0C6E)
@@ -602,7 +594,7 @@ Cheevos = [
     // get the record from film booth and play it in the child room and open the chest
     { "kind": "generic", "title": "Witness to Reunion", "description": "Reunite the lost child with his mother and retrieve the key items", "location": ChildRoom, "completionbit": ChildChestOpen(), "points": MediumPuzzle, "type": "progression"},
     // watch the film with the dr and learn it wasn't his fault
-    { "kind": "generic", "title": "Anxiety Alleviated", "description": "Help Dr Thomas Gusset see the truth and find peace", "location": Theater, "completionbit": IsSpawnedThomasGussetAstral(), "points": SmallEvent, "type": "progression"},
+    { "kind": "generic", "title": "Anxiety Alleviated", "description": "Help Dr. Thomas Gusset see the truth and find peace", "location": Theater, "completionbit": IsSpawnedThomasGussetAstral(), "points": SmallEvent, "type": "progression"},
     // pour the antidote on the acid
     { "kind": "genericrev", "title": "Rug Doctor", "description": "Clean the soiled carpet", "location": TheaterHallway, "completionbit": PouringAntidote(), "points": EasyPuzzle, "type": "progression"},
     // wear the suit and go to dine
@@ -773,7 +765,7 @@ HouseOpenedClock          = 0x100000B
 
 achievement(
     title = "A Thorough Investigation", points = EasyChallenge, type="missable",
-    description = "Investigate everything in the house before leaving the area",
+    description = "Investigate everything in the house before leaving",
     id = 461607,
     trigger = (GameRunning() && never(LocationID() != House)) &&  SteamLocomotiveComplete() == 0 &&
               once(ConfigSlotInteractionID(0) == HousePolicemanIntro) &&
@@ -807,7 +799,7 @@ LightSwitchClue3 = 0x8018fb5c
 
 achievement(
     title = "Breadcrumbs to Illumination", points = MinorChallenge, type="missable",
-    description = "In one session without saving or loading, hear the clue then turn on the secret lightswitch",
+    description = "Without saving or loading, hear the clue and then turn on the secret lightswitch",
     id = 491963,
     trigger = (GameContinuedState() > 0 && LocationID() == prev(LocationID()) && currentConfigSlotAddr() == prev(currentConfigSlotAddr()) && once(SecretLightswitchOn() == 0) &&
               never(GameLoaded()) && never(GameSaved())) &&
@@ -935,7 +927,7 @@ CURES = [
 
 achievement(
     title = "Master of Cures", points = MediumChallenge, type="missable",
-    description = "Collect Every cure potion",
+    description = "Collect every cure potion",
     trigger = disable_when(GameContinuedState() == 0, until=GameContinuedState() > 0) && saveAndLoadStatus() == 0 &&
               measured(
                 (sum_of(range(0,length(CURES)-1), (i) => ~(CURES[i]["cure"]) * CURES[i]["bit"]) == length(CURES))
@@ -1037,8 +1029,8 @@ CupClues = [
 ]
 
 PQClock = [
-{"location": ForestRoom, "id": 0x64, "fid": ReadingText, "dptr": 0x8018eef0},
-{"location": ForestRoom, "id": 0x64, "fid": ReadingText, "dptr": 0x8018ef74},
+{"location": ForestRoom, "id": 0x64, "fid": ReadingText, "dptr": 0x8018eef0},  //crea's room is on the other side, my father knew how to get to the other side
+{"location": ForestRoom, "id": 0x64, "fid": ReadingText, "dptr": 0x8018ef74},  //but jack might also know as well
 {"location": FireRoom,   "id": 0x6e, "fid": ReadingText, "dptr": 0x8018f200},  //adjust the hallway clock to the bird
 ]
 
@@ -1067,7 +1059,10 @@ PoolPump = [
 
 
 Claudia = [
-    UprDeckCompartment,
+// Compartment doesn't fit the pattern, probably because its a static always spawn room, and she can be permanently scared out
+// TODO:  Reduce points for claudia to 10, add cheevo for scaring her out of compartment
+
+//    UprDeckCompartment,
     UprDeckPassagewayInside,
     Pilothouse,
     GuestRoomA,
@@ -1098,14 +1093,17 @@ function ClaudiaTooEarlyPause() {
     return disable_when(locationMapBit(AbandonedMineC) == 0, until=(locationMapBit(AbandonedMineC) == 1))
 }
 
+function ClaudiaTooLatePause() {
+    return disable_when((LocationID() != SpecialGuestRoom && ClaudiaDollReturned() == 1), until=(ClaudiaDollReturned() == 0))
+}
+
 function KingTooEarlyPause() {
     return disable_when(HaveCameo() == 0, until=(HaveCameo() == 1))
 }
 
-//function statePTR() => dword(0x9f920)
-//PausedOrMenu    = 0x801849c0  // seems to be set when a menu is up or the game is paused
-//ResultsScreen   = 0x801789c0  // results screen up
-
+function KingTooLatePause() {
+    return disable_when((LocationID() != PrivateQuarters && KingGivenCameo() == 1), until=(KingGivenCameo() == 0))
+}
 
 
 // Make sure that we don't start counting claudia interactions until the doll is picked up. At this point all of claudias locations are available.
@@ -1113,7 +1111,7 @@ function KingTooEarlyPause() {
 // reset if player takes damage, pause lock until gameload
 
 function ClaudiaPreconditions() {
-    return ClaudiaTooEarlyPause() && 
+    return ClaudiaTooEarlyPause() && ClaudiaTooLatePause() &&
          GameRunning() && never(GameLoaded()) && never(GameOver()) && never(TakenDamage()) &&
          pauseLockCondition()
 }
@@ -1125,7 +1123,7 @@ function ClaudiaPostconditions() {
 
 
 function KingPreconditions() {
-    return KingTooEarlyPause() &&
+    return KingTooEarlyPause() && KingTooLatePause() &&
          GameRunning() && never(GameLoaded()) && never(GameOver()) && never(TakenDamage()) &&
          pauseLockCondition()
 }
@@ -1138,12 +1136,13 @@ function GhostChaseAIActive() {
     return word(0x1c4368) == 1
 }
 
-GhostRespawnTimer = dword(0x1dea18)
+GhostCycleTimer   = dword(0x1dea18)
+GhostRespawnTimer = dword(0x1dea14)
 
 
-// GhostCycleTimer dropping from 1 -> 0 is a completed ghost cycle.  Ghost despawns until timer
+// GhostCycleTimer dropping from 1 -> 0 is a completed ghost cycle.  Ghost despawns until GhostRespawnTimer=0
 function GhostCycleComplete() { 
-  return GhostChaseAIActive() && GhostRespawnTimer == 0 && prev(GhostRespawnTimer) == 1
+  return GhostChaseAIActive() && GhostCycleTimer == 0 && prev(GhostCycleTimer) == 1
 }
 
 function GhostCondition(loc) {
@@ -1191,6 +1190,21 @@ function AchievementInteractionFunction(cheev,conditiontype) {
                            cheev["list"], length(cheev["list"]),
                            (o) => once(
                                   LocationID() == o["location"] && 
+                                  g_current_config_slot["id"] == o["id"] && 
+                                  g_current_config_slot["func_id"] == o["fid"] && 
+                                  g_current_config_slot["data_ptr"] == o["dptr"] && 
+                                  prev(g_current_config_slot["data_ptr"] != o["dptr"])
+                                  )
+                  )) && cheev["postconditions"])
+    ) 
+  } else if conditiontype == "bothandnext" {
+        achievement(
+        title = cheev["title"], points = cheev["points"], description = cheev["description"], type = cheev["type"], id=id_or_zero(cheev),
+        trigger = (InteractionAchievementPreconditions() && cheev["preconditions"]) &&
+                  (measured(tally_of(
+                           cheev["list"], length(cheev["list"]),
+                           (o) => once(
+                                  (cheev["andnext"] && LocationID() == o["location"]) && 
                                   g_current_config_slot["id"] == o["id"] && 
                                   g_current_config_slot["func_id"] == o["fid"] && 
                                   g_current_config_slot["data_ptr"] == o["dptr"] && 
@@ -1249,8 +1263,10 @@ for c in ClaudiaCheevos {
 
 
 function AchievementInteractionMgr(cheev) {
-
-  if dictionary_contains_key(cheev,"postconditions") {
+  
+  if dictionary_contains_key(cheev, "andnext") {
+        AchievementInteractionFunction(cheev,"bothandnext")
+  } else if dictionary_contains_key(cheev,"postconditions") {
      if dictionary_contains_key(cheev,"preconditions") {
         AchievementInteractionFunction(cheev,"both")
      } else {
@@ -1273,9 +1289,9 @@ InteractionCheevos = [
    "postconditions": SolvedCryptPuzzle() > prev(SolvedCryptPuzzle()) && never(LocationID() != CemeteryGraveyard) },
 {"title": "Is Anything Else Open?", "points": Minor, "description": "Overstay your welcome and get kicked out of the casino", "list": CasinoKickOut, "type": "missable", "id": 499034},
 {"title": "Clued Cup", "points": EasyPuzzle, "description": "Discover the clues and then pick up the cup", "list": CupClues, "type": "missable", "id": 505897,
-   "postconditions": trigger_when(once(LocationID() == GuestHallway && IsSpawnedCup() < prev(IsSpawnedCup()))), "preconditions": once(IsSpawnedCup() == 1)},
-{"title": "Clues Clocked", "points": EasyPuzzle, "description": "Discover the clues and then pick up the clock key", "list": PQClock, "type": "missable", "id": 505899,
-   "postconditions": trigger_when(once(LocationID() == WaterRoom && IsSpawnedClockKey() < prev(IsSpawnedClockKey()))), "preconditions": once(IsSpawnedClockKey() == 1)},   
+   "postconditions": trigger_when(once(LocationID() == GuestHallway && IsSpawnedCup() < prev(IsSpawnedCup()))), "preconditions": once(IsSpawnedCup() == 1), "andnext": IsSpawnedCup() == 1},
+{"title": "Clues Clocked", "points": EasyPuzzle, "description": "Locate the clock key and then discover the clues before picking it up", "list": PQClock, "type": "missable", "id": 505899,
+   "postconditions": trigger_when(once(LocationID() == WaterRoom && IsSpawnedClockKey() < prev(IsSpawnedClockKey()))), "preconditions": once(IsSpawnedClockKey() == 1), "andnext": IsSpawnedClockKey() == 1},   
 {"title": "Pow.r th. Po.l P.mp", "points": MediumPuzzle, "type": "missable", "description": "View the instruction tooltip and start the pool pump", "list": PoolPump, "id": 497952,
    "preconditions": once(PoolPumpStarted() == 0), "postconditions": trigger_when(PoolPumpStarted() > prev(PoolPumpStarted())) && never(LocationID() != TerraceLazarette)
 }
@@ -1312,7 +1328,7 @@ achievement(
 King = 0xdc
 
 achievement(
-    title = "Between a King and a Hard Place", points = EasyChallenge,
+    title = "Between a King and a Hard Place", points = EasyChallenge, type="missable",
     description = "Escape the mess room without being hit by the king",
     trigger = GameRunning() &&
               once(LocationID() == MessRoom && prev(LocationID() == DiningRoomGalley)) &&
@@ -1371,7 +1387,7 @@ RoulettePayout      = 0x202
 
 achievement(
     title = "Wheel of Fortune", points = MinorChallenge, type="missable",
-    description = "Win at least 3 more chips than you bet while playing a single round of roulette",
+    description = "Win at least three more chips than you bet while playing a single round of roulette",
     id = 492103,
     trigger = GameRunning() && LocationID() == Casino && CodeFlow() == PlayingRoulette && rouletteStatus() == RoulettePayout &&
               prev(rouletteStatus()) == RouletteInnerSpin && (word(tbyte(0x09FA2C) + 0x000048) - rouletteChipsBet()) > 2
@@ -1462,12 +1478,20 @@ achievement(
 // several unique values could have been chosen for the rating, but i picked this one
 function ratingValue()          => dword(0x1de67c)
 // this catches the moment it changes from rendering int/phys/secrets to the ranking/total playtime 
-function resultsFirstRendered() => dword(0x1de660) == 0x91789c4 && prev(dword(0x1de660)) == 0x9000000
+function resultsFirstRendered() => dword(ptr(0x9f920)) == 0x12cfb0 && prev(dword(ptr(0x9f920))) == 0x12cf88
 // used for RP
 function ResultsPageRunning() {
     return dword(0x1de660) == 0x91789c4
 }
 
+RatingLookup = {
+    0xbf7f: "Donkey",
+    0x9f7f: "Novice",
+    0x7f7f: "Average",
+    0x5f7f: "Superior",
+    0x3f7f: "Genius",
+    0x1f7f: "ESPer",
+}
 
 ESPER    = 0x1f7f
 GENIUS   = 0x3f7f
@@ -1481,7 +1505,7 @@ achievement(
 achievement(
     title = "Ranked: Genius", points = MediumChallenge,
     description = "Complete the game with a Genius or higher rating",
-    trigger = GameRunning() && resultsFirstRendered() && ratingValue() >= GENIUS
+    trigger = GameRunning() && resultsFirstRendered() && ratingValue() <= GENIUS
 )
 
 //ENDINGS
@@ -1540,33 +1564,26 @@ achievement(
 function numSaves()     => dword(0x1a6ca0)
 
 
-rich_presence_conditional_display(gameOver() == 1, "☠️-[ Game Over 👣:{1} 🕰️ {0} 💾:{2} ]-☠️", 
+rich_presence_conditional_display(gameOver() == 1, "Game over • Total Time: {0} • AP: {1}", 
     rich_presence_value("Seconds", totalTime(), format="SECS"),
-    rich_presence_value("Number", pedometer()),
-    rich_presence_value("Number", numSaves())
+    rich_presence_value("Number", astralPiecesTurnedIn())
 )
 
-RatingLookup = {
-    0xbf7f: "Donkey",
-    0x9f7f: "Novice",
-    0x7f7f: "Average",
-    0x5f7f: "Superior",
-    0x3f7f: "Genius",
-    0x1f7f: "ESPer",
-}
 
 
-rich_presence_conditional_display(GameRunning() && ResultsPageRunning(), "🎬-[ Richard's Rating: {0} 🕰️ {1}]-🎬", 
-    rich_presence_lookup("Rating", ratingValue(), RatingLookup, "???"),
-    rich_presence_value("Seconds", totalTime(), format="SECS")    
+
+rich_presence_conditional_display(GameRunning() && ResultsPageRunning(), "Credits • Richard's Rating: {0} • Total Time:️ {1} • AP: {2}", 
+    rich_presence_lookup("Rating", ratingValue(), RatingLookup, "Unknown"),
+    rich_presence_value("Seconds", totalTime(), format="SECS"),
+     rich_presence_value("Number", astralPiecesTurnedIn())
 )
 
 SpecialLookup = {
-    0xc8: "🔴 or ⚫?: Richard is playing Roulette ",
-    0xc9: "🎰: Richard is playing Slots",
-    0xca: "🃁: Richard is playing Blackjack",
-    0xcd: "Richard is in the Theater",
-    0xd2: "Roll Credits",
+    0xc8: "Richard is playing roulette",
+    0xc9: "Richard is playing slots",
+    0xca: "Richard is playing blackjack",
+    0xcd: "Richard is in the theater",
+    0xd2: "Richard is watching the credits",
     0xd3: "Richard achieved an ending",
     0xdc: "Richard achieved the best ending",
     0xd4: "Richard was too slow and failed to escape",
@@ -1574,145 +1591,144 @@ SpecialLookup = {
 
 
 // Roulette, Slots, or Blackjack
-rich_presence_conditional_display((CodeFlow() == 0xc8 || CodeFlow() == 0xc9 || CodeFlow() == 0xca), "🤑-[ {0} 🥮:{1} ]-🤑",
-    rich_presence_lookup("Special", CodeFlow(), SpecialLookup, "???"),
+rich_presence_conditional_display((CodeFlow() == 0xc8 || CodeFlow() == 0xc9 || CodeFlow() == 0xca), "Casino • {0} Chips: {1}",
+    rich_presence_lookup("Special", CodeFlow(), SpecialLookup, "Richard is doing something unknown"),
     rich_presence_value("Number", casinoGameChips())
 )
 
 //Watching Endings, Credits, or the Theater film
 rich_presence_conditional_display((CodeFlow() == 0xdc || CodeFlow() == 0xd2 || CodeFlow() == 0xd3 || CodeFlow() == 0xcd ||
         CodeFlow() == 0xd4
-    ), "🎬-[ {0} {1} ]-🎬",
-    rich_presence_lookup("Special", CodeFlow(), SpecialLookup, "???"),
-    rich_presence_lookup("VideoFile", filenamePointerForCdRomVideoPlaying(), VideoFileLookup, "???")
+    ), "{0} • {1}",
+    rich_presence_lookup("Special", CodeFlow(), SpecialLookup, "Richard is doing something unknown"),
+    rich_presence_lookup("VideoFile", filenamePointerForCdRomVideoPlaying(), VideoFileLookup, "Watching an unknown video")
 )
 
 // Possessed
-rich_presence_conditional_display(GameRunning() && possessed() > 0, "👻-[ POSSESSED Exploring 👻👻👻👻👻 🌎:👻👻👻👻 🩹:👻 👣:👻 🕰️ 👻👻👻👻 💾:👻 ]-👻")
+rich_presence_conditional_display(GameRunning() && possessed() > 0, "Richard is possessed • {0} • Condition: {1} • AP: {2}",
+    rich_presence_lookup("Location", LocationID(), LocationLookup, "exploring parts unknown"),
+    rich_presence_lookup("PlayerCondition", playerCondition(), PlayerConditionLookup, "Unknown"),
+    rich_presence_value("Number", astralPiecesTurnedIn())
+)
 
 PuzzleLookup = {
-    0x06: "Pouring Drinks",
-    0x09: "Trying to Repair the Fusebox",
-    0x1b: "Tinkering with a Crow",
-    0x1f: "Playing music on the Jukebox",
-    0x20: "Messing with the Radio Telegraph",
-    0x25: "Trying to Open the Engine Room Door",
-    0x2c: "Tinkering with a Parrot",
-    0x28: "Working out the proper clock symbol",
-    0x29: "Working out the key to the Organ",
-    0x34: "Messing with the Crewman's Alarm",
-    0x37: "Trying to Wind the Clock",
-    0x3d: "Picking a Floor in the Observatory Elevator",
-    0x41: "Locking the Pistons in Engine Room B",
-    0x42: "Locking the Pistons in Engine Room A",
-    0x44: "Looking at the Orpheus security information",
-    0x46: "Turning the Engine Valves",
+    0x06: "pouring drinks",
+    0x09: "trying to repair the fusebox",
+    0x1b: "tinkering with a crow",
+    0x1f: "playing music on the jukebox",
+    0x20: "messing with the radio telegraph",
+    0x25: "trying to open the engine room door",
+    0x2c: "tinkering with a parrot",
+    0x28: "working out the proper clock symbol",
+    0x29: "working out the key to the organ",
+    0x34: "messing with the crewman's alarm",
+    0x37: "trying to wind the clock",
+    0x3d: "picking a floor in the observatory elevator",
+    0x41: "locking the pistons in Engine Room B",
+    0x42: "locking the pistons in Engine Room A",
+    0x44: "looking at the orpheus security information",
+    0x46: "turning the engine valves",
 }
 
 // In a puzzle
-rich_presence_conditional_display(GameRunning() && playerPuzzleStatus() == 0, "🧩-[ Richard is {0} 🌎:{1} 🩹:{2} 🕰️ {3} 👣:{4} ]-🧩",
-    rich_presence_lookup("Puzzle", LocationID(), PuzzleLookup, "???"),
-    rich_presence_lookup("Weather", weather(), WeatherLookup, "???"),
-    rich_presence_lookup("PlayerCondition", playerCondition(), PlayerConditionLookup, "???"),
+rich_presence_conditional_display(GameRunning() && playerPuzzleStatus() == 0, "Richard is {0} • Condition: {1} • Total Time: {2} • AP: {3}",
+    rich_presence_lookup("Puzzle", LocationID(), PuzzleLookup, "doing an unknown puzzle"),
+    rich_presence_lookup("PlayerCondition", playerCondition(), PlayerConditionLookup, "Unknown"),
     rich_presence_value("Seconds", totalTime(), format="SECS"),
-    rich_presence_value("Number", pedometer())
+    rich_presence_value("Number", astralPiecesTurnedIn())
 )
 
 // Escaping the orpheus
-rich_presence_conditional_display((endGameCountdownTimer() > 0 && playerPuzzleStatus() == 1 && LocationID() != 74), "🚨-[ Richard is trying to Escape the Orpheus 🕙 {0} ⏱️: {1} ]-🚨",
-    rich_presence_value("Minutes", byte(0x1A6B30) + low4(0x1A6B31) * 90.001406271973, format="MINUTES"),
-    rich_presence_value("Number", endGameCountdownTimer())
+rich_presence_conditional_display((endGameCountdownTimer() > 0 && playerPuzzleStatus() == 1 && LocationID() != 74), "Richard is trying to escape the Orpheus • Total Time: {0} • Time Left: {1} • AP: {2}",
+    rich_presence_value("Seconds", totalTime(), format="SECS"),
+    rich_presence_value("Number", endGameCountdownTimer()),
+	rich_presence_value("Number", astralPiecesTurnedIn())
 )
 
 
 TimeLocationLookup = {
-    0x14: "📅:4/10/1913",
-    0x16: "📅:11/26/1469",
-    0x17: "📅:11/26/1469",
-    0x18: "📅:3/16/1912",
-    0x21: "📅:4/12/1899",
-    0x29: "📅:12/10/1912",
-    0x2b: "📅:12/29/1910",
-    0x36: "📅:10/6/1935",
-    0x37: "📅:11/15/1937",
-    0x38: "📅:11/15/1937",
-    0x39: "📅:11/15/1937",
-    0x3a: "📅:7/27/1910",
-    0x3b: "📅:7/27/1910",
-    0x3c: "📅:7/27/1910",
-    0x3d: "📅:11/15/1937",
-    0x3e: "📅:11/15/1937",
-    0x3f: "📅:12/29/1910",
-    0x40: "📅:12/29/1910",
-    0x47: "📅:12/10/1912",
-    0x49: "📅:12/10/1912",
-    0x4b: "📅:4/11/1913",
-    0x4c: "📅:4/11/1913",
-    0x4d: "📅:11/26/1469",
-    0x4f: "📅:2/9/1913",
-    0x50: "📅:11/26/1469",
+    0x14: "• Date: 4/10/1913",
+    0x16: "• Date: 11/26/1469",
+    0x17: "• Date: 11/26/1469",
+    0x18: "• Date: 3/16/1912",
+    0x21: "• Date: 4/12/1899",
+    0x29: "• Date: 12/10/1912",
+    0x2b: "• Date: 12/29/1910",
+    0x36: "• Date: 10/6/1935",
+    0x37: "• Date: 11/15/1937",
+    0x38: "• Date: 11/15/1937",
+    0x39: "• Date: 11/15/1937",
+    0x3a: "• Date: 7/27/1910",
+    0x3b: "• Date: 7/27/1910",
+    0x3c: "• Date: 7/27/1910",
+    0x3d: "• Date: 11/15/1937",
+    0x3e: "• Date: 11/15/1937",
+    0x3f: "• Date: 12/29/1910",
+    0x40: "• Date: 12/29/1910",
+    0x47: "• Date: 12/10/1912",
+    0x49: "• Date: 12/10/1912",
+    0x4b: "• Date: 4/11/1913",
+    0x4c: "• Date: 4/11/1913",
+    0x4d: "• Date: 11/26/1469",
+    0x4f: "• Date: 2/9/1913",
+    0x50: "• Date: 11/26/1469",
     0x51: "",
-    0x52: "📽️: Flyby of The House",
-    0x53: "📅:12/10/1912",
-    0x54: "📅:4/12/1899",
-    0x55: "📅:4/12/1899",
-    0x56: "📅:11/15/1937",
+    0x52: "",
+    0x53: "• Date: 12/10/1912",
+    0x54: "• Date: 4/12/1899",
+    0x55: "• Date: 4/12/1899",
+    0x56: "• Date: 11/15/1937",
     0x57: "",
-    0x58: "📅:10/6/1935",
-    0x59: "📅:7/27/1910",
-    0x5a: "📅:3/16/1912",
-    0x5b: "📅:11/15/1937",
+    0x58: "• Date: 10/6/1935",
+    0x59: "• Date: 7/27/1910",
+    0x5a: "• Date: 3/16/1912",
+    0x5b: "• Date: 11/15/1937",
     0x5c: "",
-    0x5d: "📅:2/9/1913",
+    0x5d: "• Date: 2/9/1913",
 }
 
 
-rich_presence_conditional_display(word(LocationID() * 36 + 0x082EC4) >= 10 && dword(0x09FB10) == 1 && gametime() > word(0x0000FF), "🔎-[ {0} {1} 🌎:{2} 🩹:{3} 👣:{4} 🕰️ {5} 💾:{6} ]-🔎",
-    rich_presence_lookup("Location", LocationID(), LocationLookup, "???"),
-    rich_presence_lookup("TimeLocation", LocationID(), TimeLocationLookup, "???"),
-    rich_presence_lookup("Weather", weather(), WeatherLookup, "???"),
-    rich_presence_lookup("PlayerCondition", playerCondition(), PlayerConditionLookup, "???"),
-    rich_presence_value("Number", pedometer()),
+
+
+rich_presence_conditional_display(word(LocationID() * 36 + 0x082EC4) >= 10 && dword(0x09FB10) == 1 && gametime() > word(0x0000FF), "Richard is {0} {1} • Condition: {2} • Total Time: {3} • AP: {4}",
+    rich_presence_lookup("Location", LocationID(), LocationLookup, "exploring parts unknown"),
+    rich_presence_lookup("TimeLocation", LocationID(), TimeLocationLookup, "unknown time"),
+    rich_presence_lookup("PlayerCondition", playerCondition(), PlayerConditionLookup, "Unknown"),
     rich_presence_value("Seconds", totalTime(), format="SECS"),
-    rich_presence_value("Number", numSaves())
+    rich_presence_value("Number", astralPiecesTurnedIn())
 )
 
-rich_presence_conditional_display(dword(0x09FB10) == 1 && gametime() > word(0x0000FF), "🔎-[ {0} 🕙 {1} 🌎:{2} 🩹:{3} 👣:{4} 🕰️ {5} 💾:{6} ]-🔎",
-    rich_presence_lookup("Location", LocationID(), LocationLookup, "???"),
+
+rich_presence_conditional_display(dword(0x09FB10) == 1 && gametime() > word(0x0000FF), "Richard is {0} • Time: {1} • Condition: {2} • Total Time: {3} • AP: {4} ",
+    rich_presence_lookup("Location", LocationID(), LocationLookup, "exploring parts unknown"),
     rich_presence_value("Minutes", gametimebyte() / 2.84444 + low4(0x1A6B31) * 90.0014, format="MINUTES"),
-    rich_presence_lookup("Weather", weather(), WeatherLookup, "???"),
-    rich_presence_lookup("PlayerCondition", playerCondition(), PlayerConditionLookup, "???"),
-    rich_presence_value("Number", pedometer()),
+    rich_presence_lookup("PlayerCondition", playerCondition(), PlayerConditionLookup, "Unknown"),
     rich_presence_value("Seconds", totalTime(), format="SECS"),
-    rich_presence_value("Number", numSaves())
+    rich_presence_value("Number", astralPiecesTurnedIn())
 )
 
 
 // this checks LocationTimeID value for the current location
 // Any values >= 10 are some date other than the present and Date from lookup table is used
-rich_presence_conditional_display(word(LocationID() * 36 + 0x082EC4) >= 10 && dword(0x09FB10) == 1, "🔎-[ {0} {1} 🌎:{2} 🩹:{3} 👣:{4} 🕰️ {5} 💾:{6} ]-🔎",
-    rich_presence_lookup("Location", LocationID(), LocationLookup, "???"),
-    rich_presence_lookup("TimeLocation", LocationID(), TimeLocationLookup, "???"),
-    rich_presence_lookup("Weather", weather(), WeatherLookup, "???"),
-    rich_presence_lookup("PlayerCondition", playerCondition(), PlayerConditionLookup, "???"),
-    rich_presence_value("Number", pedometer()),
+rich_presence_conditional_display(word(LocationID() * 36 + 0x082EC4) >= 10 && dword(0x09FB10) == 1, "Richard is {0} {1} • Condition: {2} • Total Time: {3} • AP: {4}",
+    rich_presence_lookup("Location", LocationID(), LocationLookup, "exploring parts unknown"),
+    rich_presence_lookup("TimeLocation", LocationID(), TimeLocationLookup, "unknown time"),
+    rich_presence_lookup("PlayerCondition", playerCondition(), PlayerConditionLookup, "Unknown"),
     rich_presence_value("Seconds", totalTime(), format="SECS"),
-    rich_presence_value("Number", numSaves())
+    rich_presence_value("Number", astralPiecesTurnedIn())
 )
 
 
-rich_presence_conditional_display(dword(0x09FB10) == 1, "🔎-[ {0} 🕙 {1} 🌎:{2} 🩹:{3} 👣:{4} 🕰️ {5} 💾:{6} ]-🔎",
-    rich_presence_lookup("Location", LocationID(), LocationLookup, "???"),
+rich_presence_conditional_display(dword(0x09FB10) == 1, "Richard is {0} • Time: {1} • Condition: {2} • Total Time: {3} • AP: {4}",
+    rich_presence_lookup("Location", LocationID(), LocationLookup, "exploring parts unknown"),
     rich_presence_value("Minutes", gametimebyte() / 2.84444, format="MINUTES"),
-    rich_presence_lookup("Weather", weather(), WeatherLookup, "???"),
-    rich_presence_lookup("PlayerCondition", playerCondition(), PlayerConditionLookup, "???"),
-    rich_presence_value("Number", pedometer()),
+    rich_presence_lookup("PlayerCondition", playerCondition(), PlayerConditionLookup, "Unknown"),
     rich_presence_value("Seconds", totalTime(), format="SECS"),
-    rich_presence_value("Number", numSaves())
+    rich_presence_value("Number", astralPiecesTurnedIn())
 )
 
-rich_presence_conditional_display(gametime() == 0 && playerPuzzleStatus() == 0, "🤔-[ Richard is Mentally Preparing to Play Echo Night {0} ]-🤔",
-    rich_presence_lookup("VideoFile", filenamePointerForCdRomVideoPlaying(), VideoFileLookup, "???")
+rich_presence_conditional_display(gametime() == 0 && playerPuzzleStatus() == 0, "Richard is mentally preparing to play Echo Night • {0}",
+    rich_presence_lookup("VideoFile", filenamePointerForCdRomVideoPlaying(), VideoFileLookup, "Watching an unknown video")
 )
 
 rich_presence_display("Oh no, this should never be seen!")
@@ -1786,4 +1802,6 @@ leaderboard(
     format="SECS",
     lower_is_better=true
 )
+
+
 

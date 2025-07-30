@@ -109,10 +109,6 @@ location_names = [
     "The Past - House(Outside)"  # 0x5d
 ]
 
-
-
-
-
 spawnFlags = [
     {"location": 0x00, "field_name": "Bitflags1", "bit": 0, "description": "metal handle"},
     {"location": 0x00, "field_name": "Bitflags1", "bit": 1, "description": "metal handle being attached (temporary)"},
