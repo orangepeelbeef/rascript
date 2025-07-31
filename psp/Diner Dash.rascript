@@ -944,54 +944,41 @@ achievement(
               once(endless_shift_stars() >= 3 && never(endless_shift_stars() == 0))
 )
 
+
+stars =[
+diner_level_1_star(),   diner_level_2_star(),   diner_level_3_star(),   diner_level_4_star(),   diner_level_5_star(),
+diner_level_6_star(),   diner_level_7_star(),   diner_level_8_star(),   diner_level_9_star(),   diner_level_10_star(),
+
+mexican_level_1_star(), mexican_level_2_star(), mexican_level_3_star(), mexican_level_4_star(), mexican_level_5_star(),
+mexican_level_6_star(), mexican_level_7_star(), mexican_level_8_star(), mexican_level_9_star(), mexican_level_10_star(),
+
+seafood_level_1_star(), seafood_level_2_star(), seafood_level_3_star(), seafood_level_4_star(), seafood_level_5_star(),
+seafood_level_6_star(), seafood_level_7_star(), seafood_level_8_star(), seafood_level_9_star(), seafood_level_10_star(),
+
+retro_level_1_star(),   retro_level_2_star(),   retro_level_3_star(),   retro_level_4_star(),   retro_level_5_star(),
+retro_level_6_star(),   retro_level_7_star(),   retro_level_8_star(),   retro_level_9_star(),   retro_level_10_star(),
+
+goddess_level_1_star(), goddess_level_2_star(), goddess_level_3_star(), goddess_level_4_star(), goddess_level_5_star(),
+goddess_level_6_star(), goddess_level_7_star(), goddess_level_8_star(), goddess_level_9_star(), goddess_level_10_star(),
+
+sushi_level_1_star(),   sushi_level_2_star(),   sushi_level_3_star(),   sushi_level_4_star(),   sushi_level_5_star(),
+sushi_level_6_star(),   sushi_level_7_star(),   sushi_level_8_star(),   sushi_level_9_star(),   sushi_level_10_star(),
+sushi_level_11_star(),  sushi_level_12_star(),  sushi_level_13_star(),  sushi_level_14_star(),  sushi_level_15_star(),
+sushi_level_16_star(),  sushi_level_17_star(),  sushi_level_18_star(),  sushi_level_19_star(),  sushi_level_20_star(),
+]
+
+function expert_count() {
+    return sum_of(stars, (s) => s)
+}
+
 achievement(
     title = "Gordon Would Be Very Proud", points = 50,
     description = "Thank you for providing excellent food service. (Expert all levels)",
     id = 185077, badge = "205788", 
-    trigger = (prev(diner_level_1_star()) + prev(diner_level_2_star()) + prev(diner_level_3_star()) +
-              prev(diner_level_4_star()) + prev(diner_level_5_star()) + prev(diner_level_6_star()) +
-              prev(diner_level_7_star()) + prev(diner_level_8_star()) + prev(diner_level_9_star()) +
-              prev(diner_level_10_star()) + prev(mexican_level_1_star()) + prev(mexican_level_2_star()) +
-              prev(mexican_level_3_star()) + prev(mexican_level_4_star()) + prev(mexican_level_5_star()) +
-              prev(mexican_level_6_star()) + prev(mexican_level_7_star()) + prev(mexican_level_8_star()) +
-              prev(mexican_level_9_star()) + prev(mexican_level_10_star()) + prev(seafood_level_1_star()) +
-              prev(seafood_level_2_star()) + prev(seafood_level_3_star()) + prev(seafood_level_4_star()) +
-              prev(seafood_level_5_star()) + prev(seafood_level_6_star()) + prev(seafood_level_7_star()) +
-              prev(seafood_level_8_star()) + prev(seafood_level_9_star()) + prev(seafood_level_10_star()) +
-              prev(retro_level_1_star()) + prev(retro_level_2_star()) + prev(retro_level_3_star()) +
-              prev(retro_level_4_star()) + prev(retro_level_5_star()) + prev(retro_level_6_star()) +
-              prev(retro_level_7_star()) + prev(retro_level_8_star()) + prev(retro_level_9_star()) +
-              prev(retro_level_10_star()) + prev(goddess_level_1_star()) + prev(goddess_level_2_star()) +
-              prev(goddess_level_3_star()) + prev(goddess_level_4_star()) + prev(goddess_level_5_star()) +
-              prev(goddess_level_6_star()) + prev(goddess_level_7_star()) + prev(goddess_level_8_star()) +
-              prev(goddess_level_9_star()) + prev(goddess_level_10_star()) + prev(sushi_level_1_star()) +
-              prev(sushi_level_2_star()) + prev(sushi_level_3_star()) + prev(sushi_level_4_star()) +
-              prev(sushi_level_5_star()) + prev(sushi_level_6_star()) + prev(sushi_level_7_star()) +
-              prev(sushi_level_8_star()) + prev(sushi_level_9_star()) + prev(sushi_level_10_star()) +
-              prev(sushi_level_11_star()) + prev(sushi_level_12_star()) + prev(sushi_level_13_star()) +
-              prev(sushi_level_14_star()) + prev(sushi_level_15_star()) + prev(sushi_level_16_star()) +
-              prev(sushi_level_17_star()) + prev(sushi_level_18_star()) + prev(sushi_level_19_star()) +
-              prev(sushi_level_20_star())) == 68 &&
-              measured((diner_level_1_star() + diner_level_2_star() + diner_level_3_star() + diner_level_4_star() +
-                  diner_level_5_star() + diner_level_6_star() + diner_level_7_star() + diner_level_8_star() +
-                  diner_level_9_star() + diner_level_10_star() + mexican_level_1_star() + mexican_level_2_star() +
-                  mexican_level_3_star() + mexican_level_4_star() + mexican_level_5_star() + mexican_level_6_star() +
-                  mexican_level_7_star() + mexican_level_8_star() + mexican_level_9_star() + mexican_level_10_star() +
-                  seafood_level_1_star() + seafood_level_2_star() + seafood_level_3_star() + seafood_level_4_star() +
-                  seafood_level_5_star() + seafood_level_6_star() + seafood_level_7_star() + seafood_level_8_star() +
-                  seafood_level_9_star() + seafood_level_10_star() + retro_level_1_star() + retro_level_2_star() +
-                  retro_level_3_star() + retro_level_4_star() + retro_level_5_star() + retro_level_6_star() +
-                  retro_level_7_star() + retro_level_8_star() + retro_level_9_star() + retro_level_10_star() +
-                  goddess_level_1_star() + goddess_level_2_star() + goddess_level_3_star() + goddess_level_4_star() +
-                  goddess_level_5_star() + goddess_level_6_star() + goddess_level_7_star() + goddess_level_8_star() +
-                  goddess_level_9_star() + goddess_level_10_star() + sushi_level_1_star() + sushi_level_2_star() +
-                  sushi_level_3_star() + sushi_level_4_star() + sushi_level_5_star() + sushi_level_6_star() +
-                  sushi_level_7_star() + sushi_level_8_star() + sushi_level_9_star() + sushi_level_10_star() +
-                  sushi_level_11_star() + sushi_level_12_star() + sushi_level_13_star() + sushi_level_14_star() +
-                  sushi_level_15_star() + sushi_level_16_star() + sushi_level_17_star() + sushi_level_18_star() +
-                  sushi_level_19_star() + sushi_level_20_star()) == 69
-              )
+    trigger = sum_of(stars, (s) => prev(s)) == length(stars)-1 &&
+              measured(sum_of(stars, (s) => s) == length(stars))
 )
+
 
 leaderboard(
     id = 28002, title = "Endless Shift: Diner",
@@ -1051,4 +1038,19 @@ leaderboard(
     submit = endless_shift_stars() == 0,
     value  = score_32_bit(),
     format = "VALUE"
+)
+
+CareerLookup = {
+    00: "🍔's in Regular Diner",
+    01: "🌮's in Mexican Diner",
+    02: "🐡 in Seafood Diner",
+    03: "✨ in Retro Diner",
+    04: "🍲 as the Goddess in her Diner",
+    05: "🍣 in Sushi Diner",
+}
+
+rich_presence_display("Serving {0} | Score:{1} | Expert:{2}",
+    rich_presence_lookup("Career", word(0x9AF518), CareerLookup),
+    rich_presence_value("Digit", dword(0x9B04D8), format="Value"),
+    rich_presence_value("Expert", expert_count(), format="Value")
 )
