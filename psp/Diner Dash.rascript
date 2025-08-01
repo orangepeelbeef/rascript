@@ -22,7 +22,7 @@ function mode() => byte(0x967B7E)
 function choose_difficulty_in_endless_shift() => byte(0x967B80)
 
 // $99CD92: Diner Level 1 Star
-function diner_level_1_star() => byte(0x99CD92)
+function diner_level_1_star() => byte(0x99CD93)
 
 // $99CDA7: Diner Level 2 Star
 function diner_level_2_star() => byte(0x99CDA7)
@@ -178,7 +178,7 @@ function sushi_level_1_star() => byte(0x99D17B)
 function sushi_level_2_star() => byte(0x99D18F)
 
 // $99D1A0: Sushi Level 3 Star
-function sushi_level_3_star() => byte(0x99D1A0)
+function sushi_level_3_star() => byte(0x99D1A3)
 
 // $99D1B7: Sushi Level 4 Star
 function sushi_level_4_star() => byte(0x99D1B7)
