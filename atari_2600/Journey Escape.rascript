@@ -171,7 +171,7 @@ function game_reset() {
     return level() == 0 && timer_seconds() == 0 && timer_minutes() == 1 && byte(0x10) == 0x5 && byte(0x11) == 0 && byte(0x12) == 0
 }
 
-function reset_on_game_reset() { return never(game_reset()) }
+function reset_on_game_reset()      { return never(game_reset()) }
 function reset_if_level_decreases() { return never(level() < prev(level())) }
 
 function roadie_touched()  { return player_active() && invulnerability_timer() == 0xf0 && prev(invulnerability_timer()) != 0xf0 }
@@ -189,11 +189,11 @@ function paparazzi_touched() {
 }
 
 achievement(
-  title = "I Never Stopped Believing",
+  title = "I Never Stopped Believin'",
   id = 536212,
   points = 25,
   description = "Get a score of at least 200000",
-  trigger = game_active() && bcd(byte(0x10)) >= 20 && bcd(prev(byte(0x10))) < 20
+  trigger = game_active() && byte(0x10) >= 0x20 && prev(byte(0x10)) < 0x20
 )
 
 // Stuff for the Keep on Runnin cheevos
