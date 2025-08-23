@@ -526,7 +526,7 @@ achievement(
 RoomLookup = {
     0x00: "Language Select/Front of Castle Shadowgate",
     0x01: "Castle Shadowgate entrance",
-    0x02: "Stone Corridor with book",
+    0x02: "Stone corridor with book",
     0x03: "Vault",
     0x04: "Four door corridor",
     0x05: "Shark pool room",
@@ -574,15 +574,15 @@ RoomLookup = {
 rich_presence_conditional_display(room_id() == 0, "Ready to begin adventure")
 
 rich_presence_conditional_display(byte(0x0013f) == 0x43, "Torch: {0}% • {1} • Torch: {2}%",
-    rich_presence_value("LTorch", left_torch_life_usa_eur_version()),
-    rich_presence_lookup("Room", room_id(), RoomLookup, "parts unknown"),
-    rich_presence_value("RTorch", right_torch_life_usa_eur_version())
+    rich_presence_value("Torch", left_torch_life_usa_eur_version()),
+    rich_presence_lookup("Room", room_id(), RoomLookup, "Parts unknown"),
+    rich_presence_value("Torch", right_torch_life_usa_eur_version())
 )
 
 rich_presence_conditional_display(byte(0x0013f) == 0x52, "Torch: {0}% • {1} • Torch: {2}%",
-    rich_presence_value("LTorch", left_torch_life_j_version()),
-    rich_presence_lookup("Room", room_id(), RoomLookup, "parts unknown"),
-    rich_presence_value("RTorch", right_torch_life_j_version())
+    rich_presence_value("Torch", left_torch_life_j_version()),
+    rich_presence_lookup("Room", room_id(), RoomLookup, "Parts unknown"),
+    rich_presence_value("Torch", right_torch_life_j_version())
 )
 
 rich_presence_display("Oh no, this should never be seen!")
