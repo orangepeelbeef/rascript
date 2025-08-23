@@ -1,6 +1,9 @@
 // Journey Escape
 // #ID = 33180
 
+
+function if_else(p, t, f) { if (p) { return t } else return f }
+
 // $0000: [8-bit] Player X Position
 function player_x_position() => byte(0x000000)
 
@@ -167,8 +170,17 @@ function game_cycle() {
     return level() == 0 && timer_seconds() == 0 && timer_minutes() == 1 
 }
 
+// this detects the game reset all the way to the beginning 
 function game_reset() {
     return level() == 0 && timer_seconds() == 0 && timer_minutes() == 1 && byte(0x10) == 0x5 && byte(0x11) == 0 && byte(0x12) == 0
+}
+
+function level0_cp() {
+    return level() == 0 && timer_seconds() == 59 && prev(timer_seconds() == 0)
+}
+
+function lb_start() {
+    return level() == 0 && byte(0x10) == 0x5 && byte(0x11) == 0 && byte(0x12) == 0 && timer_seconds() == 59 && prev(timer_seconds() == 0) 
 }
 
 function reset_on_game_reset()      { return never(game_reset()) }
@@ -187,6 +199,10 @@ function object_collision() => byte(0x2e)
 function paparazzi_touched() { 
     return player_active() && object_collision() != 0xff && byte(object_collision() + 0x000030) == 0 && music_id() == 4
 }
+
+
+function game_over() { return bit7(0x14) == 1 && prev(bit7(0x14)) == 0 }
+function game_over_rp() { return bit7(0x14) == 1}
 
 achievement(
   title = "I Never Stopped Believin'",
@@ -217,30 +233,50 @@ for i in range(0,4) {
   )
 }
 
-// this function allows the beat 5 levels achievements to work on second cycle
-function reset_pause() {
+// this detects a new loop
+function new_loop() {
     return (level() == 0 && timer_seconds() == 0 && timer_minutes() == 1)
 }
 
 function beat_all_levels() { return repeated(4,level() > prev(level())) }
+
+/*
+achievement(
+  title = "I'll Be Alright Without You",
+  points = 25,
+  id = 536230,
+  description = "Beat all five levels without engaging the services of a manager or roadie",
+  trigger = disable_when(roadie_touched(), until=new_loop()) &&
+          disable_when(manager_touched(), until=new_loop()) && never(game_reset()) && never(new_loop()) &&
+          game_active() && trigger_when(beat_all_levels() && game_won())
+)*/
 
 achievement(
   title = "I'll Be Alright Without You",
   points = 25,
   id = 536230,
   description = "Beat all five levels without engaging the services of a manager or roadie",
-  trigger = disable_when(roadie_touched(), until=reset_pause()) &&
-          disable_when(manager_touched(), until=reset_pause()) && never(game_reset()) && reset_if_level_decreases() &&
-          game_active() && trigger_when(beat_all_levels() && game_won())
+  trigger = game_active() && once(level0_cp()) && trigger_when(game_won()) && never(roadie_touched()) && never(manager_touched()) && 
+            never(game_reset()) && never(game_over())
 )
+
+/*
+achievement(
+  title = "No Pictures, Please",
+  points = 10,
+  id = 536231,
+  description = "Beat all five levels without touching a photographer",
+  trigger = disable_when(paparazzi_touched(), until=new_loop()) &&  never(game_reset()) && never(new_loop()) &&
+          game_active() && trigger_when(beat_all_levels() && game_won())
+)*/
 
 achievement(
   title = "No Pictures, Please",
   points = 10,
   id = 536231,
   description = "Beat all five levels without touching a photographer",
-  trigger = disable_when(paparazzi_touched(), until=reset_pause()) &&  never(game_reset()) && reset_if_level_decreases() && game_active() &&
-          trigger_when(beat_all_levels() && game_won())
+  trigger = game_active() && once(level0_cp()) && trigger_when(game_won()) && never(paparazzi_touched()) && 
+            never(game_reset()) && never(game_over())
 )
 
 achievement(
@@ -339,8 +375,7 @@ rescued_lookup = {
     4: "🥁,🎹,🍑🎸,🎸",
 }
 
-function game_over() { return bit7(0x14) == 1 && prev(bit7(0x14)) == 0 }
-function game_over_rp() { return bit7(0x14) == 1}
+
 
 rich_presence_conditional_display(in_demo(), "Watching the demo loop")
 rich_presence_conditional_display(level() == 0x5, "Watching the demo loop")
@@ -375,10 +410,15 @@ leaderboard(
     title = "Escapist - High Scorer",
     id = 136415,
     description = "Get as many points as you can, submits on game over",
-    start  = game_active() && game_over(),
+    start  = game_active() && lb_start(),
     cancel = game_reset(),
     submit = game_active() && game_over(),
-    value  = score(),
+    //value  = score(),
+    value = max_of(array_map(range(0,20), 
+		n => measured(1000000 * n + score(), 
+			when=if_else(n == 0, always_true(), tally(n, prev(byte(0x000010)) > 0x95 &&  byte(0x000010) < 0x50))
+		)
+	)),
     format = "VALUE"
 )
 
@@ -395,3 +435,4 @@ leaderboard(
              ),
     format = "VALUE"
 )
+
